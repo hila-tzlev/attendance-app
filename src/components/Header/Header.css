@@ -1,0 +1,28 @@
+.header {
+    width: 100%;
+    padding: 10px 20px;
+    background-color: #E6F0FA;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .header-logo {
+    width: 100px;
+    height: auto;
+  }
+  
+  /* רספונסיביות */
+  @media (max-width: 480px) {
+    .header {
+      padding: 8px 15px;
+    }
+  
+    .header-logo {
+      width: 80px;
+    }
+  }

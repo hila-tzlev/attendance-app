@@ -1,0 +1,79 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+  }
+  
+  .modal-message {
+    font-size: 16px;
+    color: #003087;
+    margin-bottom: 20px;
+  }
+  
+  .modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .modal-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .modal-button.confirm {
+    background-color: #E6F0FA;
+    color: #003087;
+    border: 2px solid #003087;
+  }
+  
+  .modal-button.confirm:hover {
+    background-color: #D6E4F5;
+  }
+  
+  .modal-button.cancel {
+    background-color: #f0f0f0;
+    color: #666;
+    border: 2px solid #666;
+  }
+  
+  .modal-button.cancel:hover {
+    background-color: #e0e0e0;
+  }
+  
+  /* רספונסיביות */
+  @media (max-width: 480px) {
+    .modal-content {
+      padding: 15px;
+    }
+  
+    .modal-message {
+      font-size: 14px;
+    }
+  
+    .modal-button {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+  }

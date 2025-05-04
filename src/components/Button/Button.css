@@ -1,0 +1,35 @@
+button.button {
+    width: 100%;
+    max-width: 70px; /* גודל הכפתור שנקבע קודם */
+    padding: 6px 8px;
+    margin: 5px 0;
+    background-color: #002f87e8 !important; /* כחול בהיר נייטרלי */
+    color: #E6F0FA !important; /* טקסט כחול כהה */
+    border: 2px solid #002f87f1 !important; /* מסגרת כחולה כהה */
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex; /* שימוש ב-flex כדי למרכז את הטקסט */
+    justify-content: center; /* מרכוז אופקי */  
+    align-items: center; /* מרכוז אנכי */
+    margin-left: auto; /* מרכוז הכפתור בעמוד */
+    margin-right: auto;
+  }
+  
+  button.button:hover {
+    background-color: #002f87c0 !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* רספונסיביות */
+  @media (max-width: 480px) {
+    button.button {
+      max-width: 30%; /* 30% מהרוחב במובייל */
+      font-size: 12px;
+      padding: 4px 6px;
+      margin: 4px 0;
+    }
+  }

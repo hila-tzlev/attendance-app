@@ -1,0 +1,36 @@
+.footer {
+    width: 100%;
+    padding: 10px 20px;
+    background-color: #E6F0FA;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    bottom: 0;
+    text-align: center;
+    z-index: 100;
+  }
+  
+  .footer-text {
+    font-size: 12px;
+    color: #003087;
+    margin: 0;
+  }
+  
+  .footer-text a {
+    color: #003087;
+    text-decoration: none;
+  }
+  
+  .footer-text a:hover {
+    text-decoration: underline;
+  }
+  
+  /* רספונסיביות */
+  @media (max-width: 480px) {
+    .footer {
+      padding: 8px 15px;
+    }
+  
+    .footer-text {
+      font-size: 10px;
+    }
+  }

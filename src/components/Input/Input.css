@@ -1,0 +1,29 @@
+.input {
+    width: 100%;
+    max-width: 300px;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 2px solid #E6F0FA !important; /* הוספנו !important */
+    border-radius: 8px;
+    font-size: 16px;
+    direction: ltr;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    direction: rtl;
+  }
+  
+  .input:focus {
+    outline: none;
+    border-color: #003087 !important; /* הוספנו !important */
+    box-shadow: 0 0 5px rgba(0, 53, 135, 0.3);
+  }
+  
+  /* רספונסיביות */
+  @media (max-width: 480px) {
+    .input {
+      max-width: 80%;
+      font-size: 14px;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+  }
