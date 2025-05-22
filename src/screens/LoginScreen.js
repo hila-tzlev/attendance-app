@@ -8,6 +8,7 @@ import prisma from '../lib/prisma';
 
 const LoginScreen = () => {
   const [employeeId, setEmployeeId] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -70,8 +71,14 @@ const LoginScreen = () => {
           value={employeeId}
           onChange={(e) => setEmployeeId(e.target.value)}
         />
+        <Input
+          type="password"
+          placeholder="סיסמה"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
         {error && <div className="error">{error}</div>}
-        <Button onClick={handleLogin}>כניסה</Button>
+        <Button title="התחבר" onClick={handleLogin} />
       </div>
     </Layout>
   );
