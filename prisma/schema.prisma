@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,33 +8,33 @@ datasource db {
 }
 
 model User {
-  id          Int           @id @default(autoincrement())
-  employeeId  String        @unique
-  name        String
-  isManager   Boolean       @default(false)
-  attendances Attendance[]
+  employeeId    String         @unique
+  name          String
+  isManager     Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  id            Int            @id @default(autoincrement())
+  attendances   Attendance[]
   manualUpdates ManualUpdate[]
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
 }
 
 model Attendance {
-  id       Int      @id @default(autoincrement())
-  userId   Int
-  user     User     @relation(fields: [userId], references: [id])
-  clockIn  DateTime
-  clockOut DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  clockIn   DateTime
+  clockOut  DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id])
 }
 
 model ManualUpdate {
-  id       Int      @id @default(autoincrement())
-  userId   Int
-  user     User     @relation(fields: [userId], references: [id])
-  date     DateTime
-  hours    String
-  status   String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  date      DateTime
+  hours     String
+  status    String   @default("PENDING")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
 }
