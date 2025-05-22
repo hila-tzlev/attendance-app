@@ -1,20 +1,15 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Input from '../components/Input/Input';
 import Button from '../components/Button/Button';
 import Layout from '../components/Layout/Layout';
+import prisma from '../lib/prisma';
 
 const LoginScreen = () => {
   const [employeeId, setEmployeeId] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-
-  // מיפוי ת"ז לשמות (לצורך הדוגמה)
-  const employeeNames = {
-    '322754672': 'מנהל מערכת',
-    '123456782': 'דני כהן',
-    '987654321': 'שרה לוי',
-  };
 
   const validateIsraeliID = (id) => {
     id = id.trim().replace(/[\s-]/g, '');
@@ -29,31 +24,55 @@ const LoginScreen = () => {
     return sum % 10 === 0;
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!employeeId) {
       setError('נא להזין מספר זהות');
-    } else if (!validateIsraeliID(employeeId)) {
+      return;
+    }
+    
+    if (!validateIsraeliID(employeeId)) {
       setError('מספר זהות אינו תקין. אנא בדוק שוב.');
-    } else {
+      return;
+    }
+
+    try {
+      const user = await prisma.user.findUnique({
+        where: { employeeId }
+      });
+
+      if (!user) {
+        // אם המשתמש לא קיים, ניצור אותו
+        const newUser = await prisma.user.create({
+          data: {
+            employeeId,
+            name: 'משתמש חדש', // ניתן לעדכן את השם בהמשך
+            isManager: employeeId === '322754672'
+          }
+        });
+        user = newUser;
+      }
+
       setError('');
-      localStorage.setItem('employeeId', employeeId);
-      localStorage.setItem('isManager', employeeId === '322754672' ? 'true' : 'false');
-      localStorage.setItem('employeeName', employeeNames[employeeId] || 'עובד');
       navigate('/home');
+    } catch (error) {
+      console.error('Error during login:', error);
+      setError('אירעה שגיאה בהתחברות. אנא נסה שוב.');
     }
   };
 
   return (
     <Layout>
-      <h1 className="title">התחברות</h1>
-      <Input
-        placeholder="מספר זהות"
-        value={employeeId}
-        onChange={(e) => setEmployeeId(e.target.value)}
-        maxLength={9}
-      />
-      {error && <span className="error">{error}</span>}
-      <Button title="התחבר" onClick={handleLogin} />
+      <div className="login-container">
+        <h2 className="title">כניסה למערכת</h2>
+        <Input
+          type="text"
+          placeholder="הכנס מספר זהות"
+          value={employeeId}
+          onChange={(e) => setEmployeeId(e.target.value)}
+        />
+        {error && <div className="error">{error}</div>}
+        <Button onClick={handleLogin}>כניסה</Button>
+      </div>
     </Layout>
   );
 };
