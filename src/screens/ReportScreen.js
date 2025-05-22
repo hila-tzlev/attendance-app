@@ -1,40 +1,70 @@
-import React from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button/Button';
 import Layout from '../components/Layout/Layout';
+import prisma from '../lib/prisma';
 
 const AttendanceReportsScreen = () => {
   const navigate = useNavigate();
-  const isLoggedIn = !!localStorage.getItem('employeeId');
+  const [reports, setReports] = useState([]);
+  const employeeId = sessionStorage.getItem('employeeId');
 
-  if (!isLoggedIn) {
-    navigate('/');
-    return null;
-  }
+  useEffect(() => {
+    if (!employeeId) {
+      navigate('/');
+      return;
+    }
 
-  const handleBack = () => {
-    navigate('/home');
+    const fetchReports = async () => {
+      try {
+        const user = await prisma.user.findUnique({
+          where: { employeeId },
+          include: {
+            attendances: {
+              orderBy: { clockIn: 'desc' }
+            }
+          }
+        });
+        setReports(user?.attendances || []);
+      } catch (error) {
+        console.error('Error fetching reports:', error);
+      }
+    };
+
+    fetchReports();
+  }, [employeeId, navigate]);
+
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString('he-IL');
   };
 
-  // סימולציה של דיווחי נוכחות (בסיסי)
-  const reports = [
-    { date: '10/03/2025', timeIn: '09:00', timeOut: '17:00' },
-    { date: '11/03/2025', timeIn: '08:30', timeOut: '16:30' },
-  ];
+  const formatTime = (date) => {
+    return new Date(date).toLocaleTimeString('he-IL', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+  };
 
   return (
     <Layout>
-    <div className="login-container">
-      <h1 className="title">דיווחי נוכחות</h1>
-      <div className="welcome-message" style={{ textAlign: 'left', width: '80%' }}>
-        {reports.map((report, index) => (
-          <p key={index}>
-            תאריך: {report.date}, כניסה: {report.timeIn}, יציאה: {report.timeOut}
-          </p>
-        ))}
+      <div className="login-container">
+        <h1 className="title">דיווחי נוכחות</h1>
+        <div className="welcome-message" style={{ textAlign: 'left', width: '80%' }}>
+          {reports.length > 0 ? (
+            reports.map((report, index) => (
+              <p key={index}>
+                תאריך: {formatDate(report.clockIn)}, 
+                כניסה: {formatTime(report.clockIn)}, 
+                יציאה: {report.clockOut ? formatTime(report.clockOut) : 'טרם דווח'}
+              </p>
+            ))
+          ) : (
+            <p>אין דיווחי נוכחות להצגה</p>
+          )}
+        </div>
+        <Button title="חזור" onClick={() => navigate('/home')} style={{ marginTop: '20px' }} />
       </div>
-      <Button title="חזור" onClick={handleBack} style={{ marginTop: '20px' }} />
-    </div>
     </Layout>
   );
 };
