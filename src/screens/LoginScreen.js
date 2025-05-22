@@ -26,8 +26,13 @@ const LoginScreen = () => {
   };
 
   const handleLogin = async () => {
-    if (!employeeId || !validateIsraeliID(employeeId)) {
-      setError('פרטי ההתחברות שגויים, אנא נסה שוב');
+    if (!employeeId && !password) {
+      setError('נא להזין את פרטי ההתחברות');
+      return;
+    }
+    
+    if (!employeeId || !password || !validateIsraeliID(employeeId)) {
+      setError('אחד מפרטי ההתחברות שגויים, אנא נסה שוב');
       return;
     }
 
