@@ -26,13 +26,8 @@ const LoginScreen = () => {
   };
 
   const handleLogin = async () => {
-    if (!employeeId) {
-      setError('נא להזין מספר זהות');
-      return;
-    }
-    
-    if (!validateIsraeliID(employeeId)) {
-      setError('מספר זהות אינו תקין. אנא בדוק שוב.');
+    if (!employeeId || !validateIsraeliID(employeeId)) {
+      setError('פרטי ההתחברות שגויים, אנא נסה שוב');
       return;
     }
 
