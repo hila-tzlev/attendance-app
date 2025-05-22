@@ -1,15 +1,32 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import './Input.css';
 
-const Input = ({ placeholder, value, onChange, maxLength }) => {
+const Input = ({ type, placeholder, value, onChange, maxLength }) => {
+  const [showPassword, setShowPassword] = useState(false);
+  
+  const isPassword = type === 'password';
+  const currentType = isPassword ? (showPassword ? 'text' : 'password') : type;
+
   return (
-    <input
-      className="input"
-      placeholder={placeholder}
-      value={value}
-      onChange={onChange}
-      maxLength={maxLength}
-    />
+    <div className="input-container">
+      <input
+        className="input"
+        type={currentType}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        maxLength={maxLength}
+      />
+      {isPassword && (
+        <span 
+          className="password-toggle" 
+          onClick={() => setShowPassword(!showPassword)}
+        >
+          {showPassword ? '👁️' : '👁️‍🗨️'}
+        </span>
+      )}
+    </div>
   );
 };
 
