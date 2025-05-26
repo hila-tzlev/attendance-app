@@ -41,16 +41,16 @@ const LoginScreen = () => {
         where: { employeeId }
       });
 
-      if (!user) {
+      let currentUser = user;
+      if (!currentUser) {
         // אם המשתמש לא קיים, ניצור אותו
-        const newUser = await prisma.user.create({
+        currentUser = await prisma.user.create({
           data: {
             employeeId,
             name: 'משתמש חדש', // ניתן לעדכן את השם בהמשך
             isManager: employeeId === '322754672'
           }
         });
-        user = newUser;
       }
 
       setError('');
