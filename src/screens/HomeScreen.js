@@ -5,7 +5,6 @@ import Button from '../components/Button/Button';
 import ConfirmationModal from '../components/ConfirmationModal/ConfirmationModal';
 import ToastNotification from '../components/ToastNotification/ToastNotification';
 import Layout from '../components/Layout/Layout';
-import prisma from '../lib/prisma';
 
 const HomeScreen = () => {
   const navigate = useNavigate();
@@ -18,106 +17,112 @@ const HomeScreen = () => {
   const [toastMessage, setToastMessage] = useState(null);
 
   useEffect(() => {
-    const loadUserData = async () => {
+    const loadUserData = () => {
       const employeeId = sessionStorage.getItem('employeeId');
       if (!employeeId) {
         navigate('/');
         return;
       }
 
-      try {
-        const userData = await prisma.user.findUnique({
-          where: { employeeId },
-          include: {
-            attendances: {
-              orderBy: { clockIn: 'desc' },
-              take: 1
-            }
-          }
-        });
+      const userName = sessionStorage.getItem('userName') || 'משתמש';
+      const isManager = sessionStorage.getItem('isManager') === 'true';
+      
+      setUser({
+        employeeId,
+        name: userName,
+        isManager
+      });
 
-        if (userData) {
-          setUser(userData);
-          const lastAttendance = userData.attendances[0];
-          if (lastAttendance && !lastAttendance.clockOut) {
-            setHasClockedIn(true);
-            setLastClockInTime(new Date(lastAttendance.clockIn));
-          }
-        }
-      } catch (error) {
-        console.error('Error loading user data:', error);
-        setToastMessage('שגיאה בטעינת נתוני משתמש');
+      // בדיקה אם יש כניסה פעילה
+      const clockInData = localStorage.getItem(`clockIn_${employeeId}`);
+      if (clockInData) {
+        const clockInTime = new Date(clockInData);
+        setHasClockedIn(true);
+        setLastClockInTime(clockInTime);
       }
     };
 
     loadUserData();
+    updateGreeting();
   }, [navigate]);
 
   useEffect(() => {
-    if (lastClockInTime) {
-      const interval = setInterval(() => {
-        const elapsed = Math.floor((new Date() - lastClockInTime) / 1000);
-        setTimeLoggedIn(elapsed);
+    let interval;
+    if (hasClockedIn && lastClockInTime) {
+      interval = setInterval(() => {
+        const now = new Date();
+        const diff = Math.floor((now - lastClockInTime) / 1000);
+        setTimeLoggedIn(diff);
       }, 1000);
-      return () => clearInterval(interval);
+    } else {
+      setTimeLoggedIn(0);
     }
-  }, [lastClockInTime]);
 
-  useEffect(() => {
-    if (user) {
-      const hour = new Date().getHours();
-      let greetingText = '';
-      if (hour >= 5 && hour < 12) {
-        greetingText = 'בוקר טוב';
-      } else if (hour >= 12 && hour < 17) {
-        greetingText = 'צהריים טובים';
-      } else if (hour >= 17 && hour < 22) {
-        greetingText = 'ערב טוב';
-      } else {
-        greetingText = 'לילה טוב';
-      }
-      setGreeting(`${greetingText}, ${user.name}`);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [hasClockedIn, lastClockInTime]);
+
+  const updateGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) {
+      setGreeting('בוקר טוב');
+    } else if (hour < 18) {
+      setGreeting('צהריים טובים');
+    } else {
+      setGreeting('ערב טוב');
     }
-  }, [user]);
+  };
 
-  const handleClockInOut = async () => {
+  const handleClockInOut = () => {
     if (!user) return;
 
-    try {
-      if (!hasClockedIn) {
-        // Clock In
-        const attendance = await prisma.attendance.create({
-          data: {
-            userId: user.id,
-            clockIn: new Date()
-          }
-        });
-        setLastClockInTime(new Date(attendance.clockIn));
-        setHasClockedIn(true);
-        setToastMessage('כניסה בוצעה בהצלחה');
-      } else {
-        // Clock Out
-        await prisma.attendance.updateMany({
-          where: {
-            userId: user.id,
-            clockOut: null
-          },
-          data: {
-            clockOut: new Date()
-          }
-        });
-        setLastClockInTime(null);
-        setHasClockedIn(false);
-        setToastMessage('יציאה בוצעה בהצלחה');
-      }
-    } catch (error) {
-      console.error('Error updating attendance:', error);
-      setToastMessage('שגיאה בעדכון הנוכחות');
+    if (!hasClockedIn) {
+      // כניסה
+      const clockInTime = new Date();
+      localStorage.setItem(`clockIn_${user.employeeId}`, clockInTime.toISOString());
+      setLastClockInTime(clockInTime);
+      setHasClockedIn(true);
+      setToastMessage('כניסה בוצעה בהצלחה');
+      
+      // שמירת רשומת נוכחות
+      const attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
+      attendanceRecords.push({
+        employeeId: user.employeeId,
+        clockIn: clockInTime.toISOString(),
+        clockOut: null,
+        date: clockInTime.toDateString()
+      });
+      localStorage.setItem('attendanceRecords', JSON.stringify(attendanceRecords));
+    } else {
+      setShowModal(true);
+    }
+  };
+
+  const confirmClockOut = () => {
+    // יציאה
+    const clockOutTime = new Date();
+    localStorage.removeItem(`clockIn_${user.employeeId}`);
+    setLastClockInTime(null);
+    setHasClockedIn(false);
+    setShowModal(false);
+    setToastMessage('יציאה בוצעה בהצלחה');
+    
+    // עדכון רשומת הנוכחות
+    const attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
+    const lastRecord = attendanceRecords.find(record => 
+      record.employeeId === user.employeeId && !record.clockOut
+    );
+    if (lastRecord) {
+      lastRecord.clockOut = clockOutTime.toISOString();
+      localStorage.setItem('attendanceRecords', JSON.stringify(attendanceRecords));
     }
   };
 
   const handleLogout = () => {
     sessionStorage.removeItem('employeeId');
+    sessionStorage.removeItem('userName');
+    sessionStorage.removeItem('isManager');
     navigate('/');
   };
 
@@ -128,42 +133,74 @@ const HomeScreen = () => {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  if (!user) {
+    return <div>טוען...</div>;
+  }
+
   return (
     <Layout>
-      <h1 className="title">מסך ראשי</h1>
-      {user ? (
-        <div>
-          <p className="welcome-message">{greeting}</p>
-          {lastClockInTime && (
-            <p className="login-details">
-              כניסה אחרונה: {lastClockInTime.toLocaleString('he-IL')}
-              <br />
-              זמן מחובר: {formatTimeLoggedIn(timeLoggedIn)}
-            </p>
-          )}
-          <Button title={hasClockedIn ? 'יציאה' : 'כניסה'} onClick={handleClockInOut} />
-          <Button title="צפייה בדיווחי נוכחות" onClick={() => navigate('/report-screen')} />
-          <Button title="עדכון ידני" onClick={() => setShowModal(true)} />
-          {user.isManager && (
-            <Button title="למסך ניהול" onClick={() => navigate('/management')} />
-          )}
+      <div className="home-container">
+        <div className="welcome-section">
+          <h1>{greeting}, {user.name}!</h1>
+          <p>מספר עובד: {user.employeeId}</p>
         </div>
-      ) : (
-        <p className="welcome-message">אנא התחבר כדי להמשיך.</p>
-      )}
-      <Button title="התנתקות" onClick={handleLogout} />
+
+        <div className="clock-section">
+          <div className="current-time">
+            <p>השעה הנוכחית: {new Date().toLocaleTimeString('he-IL')}</p>
+          </div>
+
+          {hasClockedIn && (
+            <div className="time-logged">
+              <p>זמן מחובר: {formatTimeLoggedIn(timeLoggedIn)}</p>
+              <p>נכנסת בשעה: {lastClockInTime?.toLocaleTimeString('he-IL')}</p>
+            </div>
+          )}
+
+          <Button 
+            onClick={handleClockInOut}
+            className={hasClockedIn ? 'clock-out-btn' : 'clock-in-btn'}
+          >
+            {hasClockedIn ? 'יציאה' : 'כניסה'}
+          </Button>
+        </div>
+
+        <div className="navigation-section">
+          <Button onClick={() => navigate('/reports')}>
+            דוחות נוכחות
+          </Button>
+          
+          <Button onClick={() => navigate('/manual-update')}>
+            דיווח ידני
+          </Button>
+          
+          {user.isManager && (
+            <Button onClick={() => navigate('/management')}>
+              ניהול
+            </Button>
+          )}
+          
+          <Button onClick={handleLogout} className="logout-btn">
+            התנתק
+          </Button>
+        </div>
+      </div>
 
       <ConfirmationModal
         isOpen={showModal}
-        message="זהו עדכון חריג! הפרטים יועברו למנהל לאישור. האם להמשיך?"
-        onConfirm={() => {
-          setShowModal(false);
-          navigate('/manual-update');
-        }}
+        title="אישור יציאה"
+        message="האם אתה בטוח שברצונך לצאת?"
+        confirmText="יציאה"
+        cancelText="ביטול"
+        onConfirm={confirmClockOut}
         onCancel={() => setShowModal(false)}
       />
+
       {toastMessage && (
-        <ToastNotification message={toastMessage} onClose={() => setToastMessage(null)} />
+        <ToastNotification
+          message={toastMessage}
+          onClose={() => setToastMessage(null)}
+        />
       )}
     </Layout>
   );

@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import Input from '../components/Input/Input';
 import Button from '../components/Button/Button';
 import Layout from '../components/Layout/Layout';
-import prisma from '../lib/prisma';
 
 const LoginScreen = () => {
   const [employeeId, setEmployeeId] = useState('');
@@ -36,49 +35,41 @@ const LoginScreen = () => {
       return;
     }
 
-    try {
-      const user = await prisma.user.findUnique({
-        where: { employeeId }
-      });
-
-      let currentUser = user;
-      if (!currentUser) {
-        // אם המשתמש לא קיים, ניצור אותו
-        currentUser = await prisma.user.create({
-          data: {
-            employeeId,
-            name: 'משתמש חדש', // ניתן לעדכן את השם בהמשך
-            isManager: employeeId === '322754672'
-          }
-        });
-      }
-
-      setError('');
-      navigate('/home');
-    } catch (error) {
-      console.error('Error during login:', error);
-      setError('אירעה שגיאה בהתחברות. אנא נסה שוב.');
-    }
+    // שמירת נתוני המשתמש ב-sessionStorage
+    sessionStorage.setItem('employeeId', employeeId);
+    sessionStorage.setItem('userName', 'משתמש');
+    sessionStorage.setItem('isManager', employeeId === '322754672');
+    
+    setError('');
+    navigate('/home');
   };
 
   return (
     <Layout>
       <div className="login-container">
-        <h2 className="title">כניסה למערכת</h2>
-        <Input
-          type="text"
-          placeholder="הכנס מספר זהות"
-          value={employeeId}
-          onChange={(e) => setEmployeeId(e.target.value)}
-        />
-        <Input
-          type="password"
-          placeholder="סיסמה"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        {error && <div className="error">{error}</div>}
-        <Button title="התחבר" onClick={handleLogin} />
+        <h1>התחברות למערכת</h1>
+        
+        <div className="login-form">
+          <Input
+            label="מספר עובד (ת.ז.)"
+            type="text"
+            placeholder="הכנס מספר עובד"
+            value={employeeId}
+            onChange={(e) => setEmployeeId(e.target.value)}
+          />
+          
+          <Input
+            label="סיסמה"
+            type="password"
+            placeholder="הכנס סיסמה"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          
+          {error && <div className="error-message">{error}</div>}
+          
+          <Button onClick={handleLogin}>התחבר</Button>
+        </div>
       </div>
     </Layout>
   );
