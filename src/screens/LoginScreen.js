@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Input from '../components/Input/Input';
 import Button from '../components/Button/Button';
 import Layout from '../components/Layout/Layout';
+import './LoginScreen.css';
 
 const LoginScreen = () => {
   const [employeeId, setEmployeeId] = useState('');
@@ -47,29 +48,21 @@ const LoginScreen = () => {
   return (
     <Layout>
       <div className="login-container">
-        <h1>התחברות למערכת</h1>
-        
-        <div className="login-form">
-          <Input
-            label="מספר עובד (ת.ז.)"
-            type="text"
-            placeholder="הכנס מספר עובד"
-            value={employeeId}
-            onChange={(e) => setEmployeeId(e.target.value)}
-          />
-          
-          <Input
-            label="סיסמה"
-            type="password"
-            placeholder="הכנס סיסמה"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          
-          {error && <div className="error-message">{error}</div>}
-          
-          <Button onClick={handleLogin}>התחבר</Button>
-        </div>
+        <h1>התחברות</h1>
+        <Input
+          type="text"
+          placeholder="מספר זהות"
+          value={employeeId}
+          onChange={(e) => setEmployeeId(e.target.value)}
+        />
+        <Input
+          type="password"
+          placeholder="סיסמה"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        {error && <div className="error">{error}</div>}
+        <Button onClick={handleLogin}>התחבר</Button>
       </div>
     </Layout>
   );
