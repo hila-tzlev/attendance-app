@@ -23,7 +23,7 @@ const Input = ({ type, placeholder, value, onChange, maxLength }) => {
           className="password-toggle" 
           onClick={() => setShowPassword(!showPassword)}
         >
-          {showPassword ? '👁️' : '👁️‍🗨️'}
+          {showPassword ? '🙈' : '👁️'}
         </span>
       )}
     </div>

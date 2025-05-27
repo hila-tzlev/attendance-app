@@ -25,17 +25,58 @@
 
 .password-toggle {
   position: absolute;
-  left: 10px;
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
   user-select: none;
+  font-size: 18px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.password-toggle:hover {
+  background-color: rgba(0, 48, 135, 0.1);
+  color: #003087;
+}
+
+.password-toggle:active {
+  background-color: rgba(0, 48, 135, 0.2);
 }
 
 /* רספונסיביות */
 @media (max-width: 480px) {
   .input {
-    font-size: 14px;
+    font-size: 16px;
+    padding: 12px;
+    padding-left: 45px;
+  }
+  
+  .password-toggle {
+    left: 15px;
+    font-size: 20px;
+    width: 28px;
+    height: 28px;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@media (max-width: 360px) {
+  .input {
     padding: 10px;
+    padding-left: 40px;
+  }
+  
+  .password-toggle {
+    left: 12px;
+    font-size: 18px;
+    width: 26px;
+    height: 26px;
   }
 }
