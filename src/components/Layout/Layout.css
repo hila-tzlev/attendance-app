@@ -9,9 +9,7 @@
     width: 100%;
     padding: 20px;
     box-sizing: border-box;
-    background: #E6F0FA !important;
-    background: linear-gradient(135deg, #FFFFFF 0%, #E6F0FA 100%) !important;
-    background-attachment: fixed !important;
+    background-color: transparent !important;
     animation: fadeIn 0.5s ease-in;
     position: relative;
     overflow-x: hidden;
@@ -62,9 +60,7 @@
       padding: 20px 20px 100px 20px; /* Add bottom padding for mobile navigation */
       min-height: 100vh;
       min-height: 100dvh;
-      background: #E6F0FA !important;
-      background: linear-gradient(135deg, #FFFFFF 0%, #E6F0FA 100%) !important;
-      background-attachment: fixed !important;
+      background-color: transparent !important;
       justify-content: flex-start;
       padding-top: 60px;
     }
