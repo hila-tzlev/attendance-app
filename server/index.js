@@ -54,8 +54,8 @@ app.post('/api/auth/login', async (req, res) => {
 // API Routes for Attendance
 app.post('/api/attendance/clock-in', async (req, res) => {
   try {
-    const { userId } = req.body;
-    const record = await database.clockIn(userId);
+    const { userId, latitude, longitude, isManualEntry, manualReason } = req.body;
+    const record = await database.clockIn(userId, latitude, longitude, isManualEntry, manualReason);
     res.json(record);
   } catch (error) {
     console.error('Clock-in error:', error);
@@ -65,8 +65,8 @@ app.post('/api/attendance/clock-in', async (req, res) => {
 
 app.post('/api/attendance/clock-out', async (req, res) => {
   try {
-    const { userId } = req.body;
-    const record = await database.clockOut(userId);
+    const { userId, latitude, longitude } = req.body;
+    const record = await database.clockOut(userId, latitude, longitude);
     res.json(record);
   } catch (error) {
     console.error('Clock-out error:', error);
@@ -88,8 +88,8 @@ app.get('/api/attendance/today/:userId', async (req, res) => {
 // API Routes for Manual Reports
 app.post('/api/reports/manual', async (req, res) => {
   try {
-    const { userId, dateIn, timeIn, dateOut, timeOut, reason } = req.body;
-    const report = await database.createManualReport(userId, dateIn, timeIn, dateOut, timeOut, reason);
+    const { userId, clockIn, clockOut, reason, latitude, longitude } = req.body;
+    const report = await database.createManualReport(userId, clockIn, clockOut, reason, latitude, longitude);
     res.json(report);
   } catch (error) {
     console.error('Manual report error:', error);
@@ -97,14 +97,48 @@ app.post('/api/reports/manual', async (req, res) => {
   }
 });
 
-app.get('/api/reports/manual', async (req, res) => {
+app.get('/api/attendance/logs', async (req, res) => {
   try {
-    const { status } = req.query;
-    const reports = await database.getManualReports(status);
-    res.json(reports);
+    const { status, isManualEntry, departmentId } = req.query;
+    const logs = await database.getAttendanceLogs(status, isManualEntry, departmentId);
+    res.json(logs);
   } catch (error) {
-    console.error('Get reports error:', error);
-    res.status(500).json({ error: 'שגיאה בקבלת דיווחים' });
+    console.error('Get attendance logs error:', error);
+    res.status(500).json({ error: 'שגיאה בקבלת דיווחי נוכחות' });
+  }
+});
+
+app.put('/api/attendance/status/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, updatedBy } = req.body;
+    const updated = await database.updateAttendanceStatus(id, status, updatedBy);
+    res.json(updated);
+  } catch (error) {
+    console.error('Update attendance status error:', error);
+    res.status(500).json({ error: 'שגיאה בעדכון סטטוס' });
+  }
+});
+
+// API Routes for Departments
+app.get('/api/departments', async (req, res) => {
+  try {
+    const departments = await database.getDepartments();
+    res.json(departments);
+  } catch (error) {
+    console.error('Get departments error:', error);
+    res.status(500).json({ error: 'שגיאה בקבלת מחלקות' });
+  }
+});
+
+app.post('/api/departments', async (req, res) => {
+  try {
+    const { name } = req.body;
+    const department = await database.createDepartment(name);
+    res.json(department);
+  } catch (error) {
+    console.error('Create department error:', error);
+    res.status(500).json({ error: 'שגיאה ביצירת מחלקה' });
   }
 });
 

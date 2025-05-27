@@ -1,3 +1,4 @@
+
 const { Pool } = require('pg');
 
 class Database {
@@ -35,7 +36,16 @@ class Database {
   async createTables() {
     const client = await this.pool.connect();
     try {
-      // יצירת טבלת משתמשים
+      // יצירת טבלת מחלקות
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS departments (
+          id SERIAL PRIMARY KEY,
+          name VARCHAR(100) NOT NULL UNIQUE,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+
+      // יצירת טבלת משתמשים מעודכנת
       await client.query(`
         CREATE TABLE IF NOT EXISTS users (
           id SERIAL PRIMARY KEY,
@@ -43,49 +53,67 @@ class Database {
           name VARCHAR(100) NOT NULL,
           password VARCHAR(255) NOT NULL,
           is_manager BOOLEAN DEFAULT FALSE,
+          department_id INTEGER REFERENCES departments(id),
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `);
 
-      // יצירת טבלת נוכחות
+      // יצירת טבלת דיווחי נוכחות מעודכנת
       await client.query(`
-        CREATE TABLE IF NOT EXISTS attendance (
+        CREATE TABLE IF NOT EXISTS attendance_logs (
           id SERIAL PRIMARY KEY,
           user_id INTEGER REFERENCES users(id),
           clock_in TIMESTAMP,
           clock_out TIMESTAMP,
-          date DATE DEFAULT CURRENT_DATE,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `);
-
-      // יצירת טבלת דיווחים ידניים
-      await client.query(`
-        CREATE TABLE IF NOT EXISTS manual_reports (
-          id SERIAL PRIMARY KEY,
-          user_id INTEGER REFERENCES users(id),
-          date_in DATE,
-          time_in TIME,
-          date_out DATE,
-          time_out TIME,
-          reason TEXT,
           status VARCHAR(20) DEFAULT 'PENDING',
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+          is_manual_entry BOOLEAN DEFAULT FALSE,
+          manual_reason TEXT,
+          latitude DECIMAL(10, 8),
+          longitude DECIMAL(11, 8),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_by INTEGER REFERENCES users(id)
         )
       `);
 
-      console.log('Database tables created successfully');
+      // יצירת trigger לעדכון אוטומטי של updated_at
+      await client.query(`
+        CREATE OR REPLACE FUNCTION update_updated_at_column()
+        RETURNS TRIGGER AS $$
+        BEGIN
+          NEW.updated_at = CURRENT_TIMESTAMP;
+          RETURN NEW;
+        END;
+        $$ language 'plpgsql';
+      `);
+
+      await client.query(`
+        DROP TRIGGER IF EXISTS update_attendance_logs_updated_at ON attendance_logs;
+        CREATE TRIGGER update_attendance_logs_updated_at
+          BEFORE UPDATE ON attendance_logs
+          FOR EACH ROW
+          EXECUTE FUNCTION update_updated_at_column();
+      `);
+
+      // הוספת מחלקה ברירת מחדל אם לא קיימת
+      await client.query(`
+        INSERT INTO departments (name) 
+        VALUES ('מחלקה כללית') 
+        ON CONFLICT (name) DO NOTHING
+      `);
+
+      console.log('✅ Database tables created successfully');
     } finally {
       client.release();
     }
   }
 
-  async createUser(employeeId, name, password, isManager = false) {
+  async createUser(employeeId, name, password, isManager = false, departmentId = 1) {
     const client = await this.pool.connect();
     try {
       const result = await client.query(
-        'INSERT INTO users (employee_id, name, password, is_manager) VALUES ($1, $2, $3, $4) RETURNING *',
-        [employeeId, name, password, isManager]
+        'INSERT INTO users (employee_id, name, password, is_manager, department_id) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+        [employeeId, name, password, isManager, departmentId]
       );
       return result.rows[0];
     } finally {
@@ -97,7 +125,7 @@ class Database {
     const client = await this.pool.connect();
     try {
       const result = await client.query(
-        'SELECT * FROM users WHERE employee_id = $1',
+        'SELECT u.*, d.name as department_name FROM users u LEFT JOIN departments d ON u.department_id = d.id WHERE u.employee_id = $1',
         [employeeId]
       );
       return result.rows[0];
@@ -106,12 +134,13 @@ class Database {
     }
   }
 
-  async clockIn(userId) {
+  async clockIn(userId, latitude = null, longitude = null, isManualEntry = false, manualReason = null) {
     const client = await this.pool.connect();
     try {
       const result = await client.query(
-        'INSERT INTO attendance (user_id, clock_in, date) VALUES ($1, CURRENT_TIMESTAMP, CURRENT_DATE) RETURNING *',
-        [userId]
+        `INSERT INTO attendance_logs (user_id, clock_in, latitude, longitude, is_manual_entry, manual_reason, updated_by) 
+         VALUES ($1, CURRENT_TIMESTAMP, $2, $3, $4, $5, $1) RETURNING *`,
+        [userId, latitude, longitude, isManualEntry, manualReason]
       );
       return result.rows[0];
     } finally {
@@ -119,12 +148,18 @@ class Database {
     }
   }
 
-  async clockOut(userId) {
+  async clockOut(userId, latitude = null, longitude = null) {
     const client = await this.pool.connect();
     try {
       const result = await client.query(
-        'UPDATE attendance SET clock_out = CURRENT_TIMESTAMP WHERE user_id = $1 AND date = CURRENT_DATE AND clock_out IS NULL RETURNING *',
-        [userId]
+        `UPDATE attendance_logs SET 
+         clock_out = CURRENT_TIMESTAMP, 
+         latitude = COALESCE($2, latitude), 
+         longitude = COALESCE($3, longitude),
+         updated_by = $1
+         WHERE user_id = $1 AND DATE(clock_in) = CURRENT_DATE AND clock_out IS NULL 
+         RETURNING *`,
+        [userId, latitude, longitude]
       );
       return result.rows[0];
     } finally {
@@ -136,7 +171,7 @@ class Database {
     const client = await this.pool.connect();
     try {
       const result = await client.query(
-        'SELECT * FROM attendance WHERE user_id = $1 AND date = CURRENT_DATE',
+        'SELECT * FROM attendance_logs WHERE user_id = $1 AND DATE(clock_in) = CURRENT_DATE ORDER BY clock_in DESC LIMIT 1',
         [userId]
       );
       return result.rows[0];
@@ -145,12 +180,13 @@ class Database {
     }
   }
 
-  async createManualReport(userId, dateIn, timeIn, dateOut, timeOut, reason) {
+  async createManualReport(userId, clockIn, clockOut, reason, latitude = null, longitude = null) {
     const client = await this.pool.connect();
     try {
       const result = await client.query(
-        'INSERT INTO manual_reports (user_id, date_in, time_in, date_out, time_out, reason) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-        [userId, dateIn, timeIn, dateOut, timeOut, reason]
+        `INSERT INTO attendance_logs (user_id, clock_in, clock_out, is_manual_entry, manual_reason, latitude, longitude, status, updated_by) 
+         VALUES ($1, $2, $3, true, $4, $5, $6, 'PENDING', $1) RETURNING *`,
+        [userId, clockIn, clockOut, reason, latitude, longitude]
       );
       return result.rows[0];
     } finally {
@@ -158,21 +194,91 @@ class Database {
     }
   }
 
-  async getManualReports(status = null) {
+  async getAttendanceLogs(status = null, isManualEntry = null, departmentId = null) {
     const client = await this.pool.connect();
     try {
-      let query = 'SELECT mr.*, u.name, u.employee_id FROM manual_reports mr JOIN users u ON mr.user_id = u.id';
+      let query = `
+        SELECT al.*, u.name, u.employee_id, d.name as department_name,
+               ub.name as updated_by_name
+        FROM attendance_logs al 
+        JOIN users u ON al.user_id = u.id 
+        LEFT JOIN departments d ON u.department_id = d.id
+        LEFT JOIN users ub ON al.updated_by = ub.id
+        WHERE 1=1
+      `;
       const params = [];
+      let paramCount = 0;
 
       if (status) {
-        query += ' WHERE mr.status = $1';
+        paramCount++;
+        query += ` AND al.status = $${paramCount}`;
         params.push(status);
       }
 
-      query += ' ORDER BY mr.created_at DESC';
+      if (isManualEntry !== null) {
+        paramCount++;
+        query += ` AND al.is_manual_entry = $${paramCount}`;
+        params.push(isManualEntry);
+      }
+
+      if (departmentId) {
+        paramCount++;
+        query += ` AND u.department_id = $${paramCount}`;
+        params.push(departmentId);
+      }
+
+      query += ' ORDER BY al.created_at DESC';
 
       const result = await client.query(query, params);
       return result.rows;
+    } finally {
+      client.release();
+    }
+  }
+
+  async updateAttendanceStatus(attendanceId, status, updatedBy) {
+    const client = await this.pool.connect();
+    try {
+      const result = await client.query(
+        'UPDATE attendance_logs SET status = $1, updated_by = $2 WHERE id = $3 RETURNING *',
+        [status, updatedBy, attendanceId]
+      );
+      return result.rows[0];
+    } finally {
+      client.release();
+    }
+  }
+
+  async getDepartments() {
+    const client = await this.pool.connect();
+    try {
+      const result = await client.query('SELECT * FROM departments ORDER BY name');
+      return result.rows;
+    } finally {
+      client.release();
+    }
+  }
+
+  async createDepartment(name) {
+    const client = await this.pool.connect();
+    try {
+      const result = await client.query(
+        'INSERT INTO departments (name) VALUES ($1) RETURNING *',
+        [name]
+      );
+      return result.rows[0];
+    } finally {
+      client.release();
+    }
+  }
+
+  // מחיקת הטבלאות הישנות (אופציונלי - רק אם רוצים להתחיל מחדש)
+  async dropOldTables() {
+    const client = await this.pool.connect();
+    try {
+      await client.query('DROP TABLE IF EXISTS manual_reports CASCADE');
+      await client.query('DROP TABLE IF EXISTS attendance CASCADE');
+      console.log('✅ Old tables dropped successfully');
     } finally {
       client.release();
     }
