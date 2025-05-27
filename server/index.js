@@ -122,7 +122,7 @@ app.post('/api/admin/create-user', async (req, res) => {
 });
 
 // Initialize database tables on startup
-app.listen(PORT, async () => {
+app.listen(PORT, '0.0.0.0', async () => {
   console.log(`Server running on port ${PORT}`);
   
   try {

@@ -2,8 +2,9 @@ const { Pool } = require('pg');
 
 class Database {
   constructor() {
+    // חיבור זמני עד להקמת מסד נתונים אמיתי
     this.pool = new Pool({
-      connectionString: process.env.DATABASE_URL || 'postgresql://user:password@localhost:5432/attendance_db',
+      connectionString: process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/postgres',
       ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
     });
   }
