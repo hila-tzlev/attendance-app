@@ -11,11 +11,16 @@ class Database {
 
   async connect() {
     try {
+      console.log('Attempting to connect to database...');
+      console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+      
       const client = await this.pool.connect();
+      console.log('Database connected successfully');
       client.release();
       return true;
     } catch (error) {
-      console.error('Database connection error:', error);
+      console.error('Database connection error:', error.message);
+      console.error('Full error:', error);
       throw error;
     }
   }
