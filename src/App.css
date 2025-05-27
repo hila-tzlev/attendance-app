@@ -1,11 +1,19 @@
 body {
   margin: 0;
-  font-family: 'Arial', sans-serif;
-  background: linear-gradient(to left, #FFFFFF, #E6F0FA) !important;
+  font-family: 'Alef', sans-serif;
+  background: #E6F0FA !important;
+  background: linear-gradient(135deg, #FFFFFF 0%, #E6F0FA 100%) !important;
+  background-attachment: fixed !important;
 }
 
 html, body, #root {
-  background: linear-gradient(to left, #FFFFFF, #E6F0FA) !important;
+  background: #E6F0FA !important;
+  background: linear-gradient(135deg, #FFFFFF 0%, #E6F0FA 100%) !important;
+  background-attachment: fixed !important;
   min-height: 100vh;
   min-height: 100dvh;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
 }
