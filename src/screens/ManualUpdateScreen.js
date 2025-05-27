@@ -64,7 +64,7 @@ const ManualUpdateScreen = () => {
     if ((field === 'timeOut' || field === 'dateOut') && updatedReports[index].timeIn) {
       const inDateTime = new Date(`${updatedReports[index].dateIn}T${updatedReports[index].timeIn}:00`);
       const outDateTime = new Date(`${updatedReports[index].dateOut}T${updatedReports[index].timeOut || '00:00'}:00`);
-      
+
       if (outDateTime < inDateTime) {
         setToastMessage('תאריך ושעת היציאה חייבים להיות אחרי תאריך ושעת הכניסה');
         if (field === 'dateOut') {
@@ -112,20 +112,20 @@ const ManualUpdateScreen = () => {
 
   const isReportFullyValid = (report) => {
     if (!isReportValid(report)) return false;
-    
+
     const inDateTime = new Date(`${report.dateIn}T${report.timeIn}:00`);
     const outDateTime = new Date(`${report.dateOut}T${report.timeOut}:00`);
-    
+
     // בדיקת תקינות התאריכים והשעות
     if (outDateTime <= inDateTime) return false;
-    
+
     // אם התאריכים זהים, בדיקת הפרש של לפחות דקה
     if (report.dateIn === report.dateOut) {
       const inTime = new Date(`2000-01-01T${report.timeIn}:00`);
       const outTime = new Date(`2000-01-01T${report.timeOut}:00`);
       if (outTime - inTime < 60000) return false;
     }
-    
+
     return true;
   };
 

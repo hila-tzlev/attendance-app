@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button/Button';
@@ -26,7 +25,7 @@ const HomeScreen = () => {
 
       const userName = sessionStorage.getItem('userName') || 'משתמש';
       const isManager = sessionStorage.getItem('isManager') === 'true';
-      
+
       setUser({
         employeeId,
         name: userName,
@@ -84,7 +83,7 @@ const HomeScreen = () => {
       setLastClockInTime(clockInTime);
       setHasClockedIn(true);
       setToastMessage('כניסה בוצעה בהצלחה');
-      
+
       // שמירת רשומת נוכחות
       const attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
       attendanceRecords.push({
@@ -107,7 +106,7 @@ const HomeScreen = () => {
     setHasClockedIn(false);
     setShowModal(false);
     setToastMessage('יציאה בוצעה בהצלחה');
-    
+
     // עדכון רשומת הנוכחות
     const attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
     const lastRecord = attendanceRecords.find(record => 
@@ -169,17 +168,17 @@ const HomeScreen = () => {
           <Button onClick={() => navigate('/reports')}>
             דוחות נוכחות
           </Button>
-          
+
           <Button onClick={() => navigate('/manual-update')}>
             דיווח ידני
           </Button>
-          
+
           {user.isManager && (
             <Button onClick={() => navigate('/management')}>
               ניהול
             </Button>
           )}
-          
+
           <Button onClick={handleLogout} className="logout-btn">
             התנתק
           </Button>

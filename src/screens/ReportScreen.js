@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button/Button';
@@ -79,3 +78,15 @@ const AttendanceReportsScreen = () => {
 };
 
 export default AttendanceReportsScreen;
+```
+
+```
+Fix reports fetch URL
+Replacing
+<old_str>
+const response = await fetch(`http://localhost:5000/api/attendance/logs?${params}`);
+</old_str>
+with
+<new_str>
+const response = await fetch(`/api/attendance/logs?${params}`);
+</new_str>
