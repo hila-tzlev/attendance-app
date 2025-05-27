@@ -40,6 +40,7 @@
 @media (max-width: 480px) {
   .login-container {
     gap: 12px;
+    padding: 0 10px;
   }
   
   .login-container h1 {
@@ -47,16 +48,28 @@
   }
   
   .login-container .input-container {
-    max-width: 280px;
+    max-width: 100%;
+    width: 100%;
   }
   
   .login-container .error {
     font-size: 12px;
-    max-width: 280px;
+    max-width: 100%;
+    width: 100%;
   }
   
   .login-container .button {
     min-width: 100px;
     max-width: 130px;
+  }
+}
+
+@media (max-width: 360px) {
+  .login-container {
+    gap: 10px;
+  }
+  
+  .login-container h1 {
+    font-size: 18px;
   }
 }

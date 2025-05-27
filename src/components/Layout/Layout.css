@@ -5,11 +5,14 @@
     align-items: center;
     justify-content: center;
     min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height for mobile */
     width: 100%;
     padding: 20px;
     box-sizing: border-box;
-    background: linear-gradient(to left, #FFFFFF, #E6F0FA);
+    background: linear-gradient(to left, #FFFFFF, #E6F0FA) !important;
     animation: fadeIn 0.5s ease-in;
+    position: relative;
+    overflow-x: hidden;
   }
 
   .layout-logo {
@@ -54,7 +57,10 @@
   /* רספונסיביות */
   @media (max-width: 480px) {
     .layout-container {
-      padding: 15px;
+      padding: 15px 15px 80px 15px; /* Add bottom padding for mobile navigation */
+      min-height: calc(100vh - 60px);
+      min-height: calc(100dvh - 60px);
+      background: linear-gradient(to left, #FFFFFF, #E6F0FA) !important;
     }
 
     .layout-logo {
@@ -65,10 +71,19 @@
     .layout-content {
       padding: 8px 0;
       max-width: 100%;
+      width: 100%;
     }
 
     .layout-footer {
       font-size: 10px;
       margin-top: 8px;
+      padding-bottom: 20px;
+    }
+  }
+
+  /* רספונסיביות נוספת לטלפונים קטנים */
+  @media (max-width: 360px) {
+    .layout-container {
+      padding: 10px 10px 90px 10px;
     }
   }
