@@ -122,25 +122,33 @@ app.post('/api/admin/create-user', async (req, res) => {
 
 // Initialize database tables on startup
 app.listen(PORT, '0.0.0.0', async () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log('🔗 DATABASE_URL exists:', !!process.env.DATABASE_URL);
 
   try {
+    console.log('🔄 Connecting to database...');
+    await database.connect();
+    console.log('✅ Database connected successfully');
+    
     await database.createTables();
-    console.log('Database initialized successfully');
+    console.log('✅ Database tables initialized');
 
     // יצירת משתמש מנהל ראשון אם לא קיים
     try {
       const existingManager = await database.getUserByEmployeeId('322754672');
       if (!existingManager) {
         await database.createUser('322754672', 'מנהל ראשי', '123456', true);
-        console.log('Initial manager user created');
+        console.log('✅ Initial manager user created');
+      } else {
+        console.log('✅ Manager user already exists');
       }
     } catch (userError) {
-      console.log('Manager user already exists or creation failed:', userError.message);
+      console.log('⚠️ Manager user creation issue:', userError.message);
     }
 
   } catch (error) {
-    console.error('Database initialization failed:', error);
+    console.error('❌ Database initialization failed:', error.message);
+    console.error('Full error:', error);
   }
 });
 

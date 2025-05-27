@@ -3,6 +3,13 @@ const { Pool } = require('pg');
 class Database {
   constructor() {
     // חיבור לדטאבייס PostgreSQL של Replit
+    console.log('🔧 Initializing database connection...');
+    console.log('🔧 DATABASE_URL present:', !!process.env.DATABASE_URL);
+    
+    if (!process.env.DATABASE_URL) {
+      console.error('❌ DATABASE_URL is missing! Please add it to Secrets.');
+    }
+    
     this.pool = new Pool({
       connectionString: process.env.DATABASE_URL,
       ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
