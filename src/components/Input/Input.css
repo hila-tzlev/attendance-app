@@ -42,12 +42,11 @@
 }
 
 .password-toggle:hover {
-  background-color: rgba(0, 48, 135, 0.1);
   color: #003087;
 }
 
 .password-toggle:active {
-  background-color: rgba(0, 48, 135, 0.2);
+  color: #002066;
 }
 
 /* רספונסיביות */
