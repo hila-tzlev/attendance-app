@@ -2,10 +2,10 @@ const { Pool } = require('pg');
 
 class Database {
   constructor() {
-    // חיבור זמני עד להקמת מסד נתונים אמיתי
+    // חיבור לדטאבייס PostgreSQL של Replit
     this.pool = new Pool({
-      connectionString: process.env.DATABASE_URL || 'postgresql://user:password@127.0.0.1:5432/attendance',
-      ssl: false
+      connectionString: process.env.DATABASE_URL,
+      ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false
     });
   }
 
