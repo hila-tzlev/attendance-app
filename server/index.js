@@ -1,4 +1,3 @@
-
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -26,9 +25,9 @@ app.get('/api/health', async (req, res) => {
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { employeeId, password } = req.body;
-    
+
     const user = await database.getUserByEmployeeId(employeeId);
-    
+
     if (!user) {
       return res.status(401).json({ error: 'משתמש לא נמצא' });
     }
@@ -124,11 +123,11 @@ app.post('/api/admin/create-user', async (req, res) => {
 // Initialize database tables on startup
 app.listen(PORT, '0.0.0.0', async () => {
   console.log(`Server running on port ${PORT}`);
-  
+
   try {
     await database.createTables();
     console.log('Database initialized successfully');
-    
+
     // יצירת משתמש מנהל ראשון אם לא קיים
     try {
       const existingManager = await database.getUserByEmployeeId('322754672');
@@ -139,7 +138,7 @@ app.listen(PORT, '0.0.0.0', async () => {
     } catch (userError) {
       console.log('Manager user already exists or creation failed:', userError.message);
     }
-    
+
   } catch (error) {
     console.error('Database initialization failed:', error);
   }
