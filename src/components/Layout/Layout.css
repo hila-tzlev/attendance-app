@@ -10,12 +10,12 @@
     background: linear-gradient(to left, #FFFFFF, #E6F0FA);
     animation: fadeIn 0.5s ease-in;
   }
-  
+
   .layout-logo {
     width: 100px;
     margin-bottom: 20px;
   }
-  
+
   .layout-content {
     flex-grow: 0;
     width: 100%;
@@ -26,7 +26,7 @@
     flex-direction: column;
     align-items: center; /* מירכוז פנימי של התוכן */
   }
-  
+
   .layout-footer {
     font-size: 12px;
     color: #666666;
@@ -34,40 +34,36 @@
     width: 100%;
     text-align: center;
   }
-  
+
   .layout-footer a {
     color: #003087;
     text-decoration: none;
   }
-  
+
   .layout-footer a:hover {
     text-decoration: underline;
   }
-  
+
   /* אנימציה */
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
   }
-  
+
   /* רספונסיביות */
   @media (max-width: 480px) {
     .layout-container {
       padding: 10px;
+      gap: 8px; /* מרווח עוד יותר קטן במובייל */
     }
-  
+
     .layout-logo {
       width: 80px;
-      margin-bottom: 15px;
+      margin-bottom: 0;
     }
-  
+
     .layout-content {
-      padding: 10px 0;
+      padding: 0;
       max-width: 100%; /* מבטיח שיתאים למסך קטן */
-    }
-  
-    .layout-footer {
-      font-size: 10px;
-      margin-top: 10px;
     }
   }
