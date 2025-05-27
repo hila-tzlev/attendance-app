@@ -109,6 +109,18 @@ app.get('/api/reports/manual', async (req, res) => {
   }
 });
 
+// API Route for creating initial users (for testing)
+app.post('/api/admin/create-user', async (req, res) => {
+  try {
+    const { employeeId, name, password, isManager } = req.body;
+    const user = await database.createUser(employeeId, name, password, isManager);
+    res.json(user);
+  } catch (error) {
+    console.error('Create user error:', error);
+    res.status(500).json({ error: 'שגיאה ביצירת משתמש' });
+  }
+});
+
 // Initialize database tables on startup
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
@@ -116,6 +128,18 @@ app.listen(PORT, async () => {
   try {
     await database.createTables();
     console.log('Database initialized successfully');
+    
+    // יצירת משתמש מנהל ראשון אם לא קיים
+    try {
+      const existingManager = await database.getUserByEmployeeId('322754672');
+      if (!existingManager) {
+        await database.createUser('322754672', 'מנהל ראשי', '123456', true);
+        console.log('Initial manager user created');
+      }
+    } catch (userError) {
+      console.log('Manager user already exists or creation failed:', userError.message);
+    }
+    
   } catch (error) {
     console.error('Database initialization failed:', error);
   }

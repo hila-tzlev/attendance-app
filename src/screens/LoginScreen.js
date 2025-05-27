@@ -36,13 +36,33 @@ const LoginScreen = () => {
       return;
     }
 
-    // שמירת נתוני המשתמש ב-sessionStorage
-    sessionStorage.setItem('employeeId', employeeId);
-    sessionStorage.setItem('userName', 'משתמש');
-    sessionStorage.setItem('isManager', employeeId === '322754672');
-    
-    setError('');
-    navigate('/home');
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ employeeId, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // שמירת נתוני המשתמש ב-sessionStorage
+        sessionStorage.setItem('userId', data.user.id);
+        sessionStorage.setItem('employeeId', data.user.employeeId);
+        sessionStorage.setItem('userName', data.user.name);
+        sessionStorage.setItem('isManager', data.user.isManager);
+        
+        setError('');
+        navigate('/home');
+      } else {
+        setError(data.error || 'שגיאה בהתחברות');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setError('שגיאה בחיבור לשרת');
+    }
   };
 
   return (
