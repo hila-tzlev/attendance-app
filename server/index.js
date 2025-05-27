@@ -15,7 +15,29 @@ app.use(express.static(path.join(__dirname, '../build')));
 app.get('/api/health', async (req, res) => {
   try {
     await database.connect();
-    res.json({ status: 'OK', database: 'Connected' });
+    const tables = await database.checkTables();
+    res.json({ 
+      status: 'OK', 
+      database: 'Connected',
+      tables: tables,
+      port: PORT 
+    });
+  } catch (error) {
+    res.status(500).json({ status: 'Error', message: error.message });
+  }
+});
+
+// route לבדיקת מצב מלא של הדטאבייס
+app.get('/api/debug/database', async (req, res) => {
+  try {
+    await database.connect();
+    const tables = await database.checkTables();
+    await database.checkTableData();
+    res.json({ 
+      status: 'OK',
+      tables: tables,
+      message: 'Check console for detailed output'
+    });
   } catch (error) {
     res.status(500).json({ status: 'Error', message: error.message });
   }
@@ -157,6 +179,7 @@ app.post('/api/admin/create-user', async (req, res) => {
 // Initialize database tables on startup
 app.listen(PORT, '0.0.0.0', async () => {
   console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🌐 Server accessible at: http://0.0.0.0:${PORT}`);
   console.log('🔗 DATABASE_URL exists:', !!process.env.DATABASE_URL);
 
   try {
@@ -164,21 +187,33 @@ app.listen(PORT, '0.0.0.0', async () => {
     await database.connect();
     console.log('✅ Database connected successfully');
     
+    // בדיקת טבלאות קיימות
+    console.log('📋 Checking existing tables...');
+    await database.checkTables();
+    
+    console.log('🔧 Creating/updating tables...');
     await database.createTables();
     console.log('✅ Database tables initialized');
 
+    // בדיקת נתונים
+    console.log('📊 Checking table data...');
+    await database.checkTableData();
+
     // יצירת משתמש מנהל ראשון אם לא קיים
+    console.log('👤 Checking manager user...');
     try {
       const existingManager = await database.getUserByEmployeeId('322754672');
       if (!existingManager) {
-        await database.createUser('322754672', 'מנהל ראשי', '123456', true);
+        await database.createUser('322754672', 'מנהל ראשי', '123456', true, 1);
         console.log('✅ Initial manager user created');
       } else {
-        console.log('✅ Manager user already exists');
+        console.log('✅ Manager user already exists:', existingManager.name);
       }
     } catch (userError) {
       console.log('⚠️ Manager user creation issue:', userError.message);
     }
+
+    console.log('🎉 Server fully initialized and ready!');
 
   } catch (error) {
     console.error('❌ Database initialization failed:', error.message);

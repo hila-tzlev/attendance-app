@@ -272,6 +272,57 @@ class Database {
     }
   }
 
+  // בדיקת טבלאות קיימות
+  async checkTables() {
+    const client = await this.pool.connect();
+    try {
+      const result = await client.query(`
+        SELECT table_name 
+        FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        ORDER BY table_name
+      `);
+      console.log('📋 Existing tables:', result.rows.map(row => row.table_name));
+      return result.rows.map(row => row.table_name);
+    } catch (error) {
+      console.error('❌ Error checking tables:', error.message);
+      return [];
+    } finally {
+      client.release();
+    }
+  }
+
+  // בדיקת נתונים בטבלאות
+  async checkTableData() {
+    const client = await this.pool.connect();
+    try {
+      // בדיקת כמות משתמשים
+      const usersCount = await client.query('SELECT COUNT(*) FROM users');
+      console.log('👥 Users count:', usersCount.rows[0].count);
+      
+      // בדיקת כמות מחלקות
+      const deptCount = await client.query('SELECT COUNT(*) FROM departments');
+      console.log('🏢 Departments count:', deptCount.rows[0].count);
+      
+      // בדיקת כמות דיווחי נוכחות
+      const logsCount = await client.query('SELECT COUNT(*) FROM attendance_logs');
+      console.log('📊 Attendance logs count:', logsCount.rows[0].count);
+      
+      // הצגת משתמש הניסיון
+      const testUser = await client.query('SELECT * FROM users WHERE employee_id = $1', ['322754672']);
+      if (testUser.rows.length > 0) {
+        console.log('✅ Test user exists:', testUser.rows[0]);
+      } else {
+        console.log('❌ Test user not found');
+      }
+      
+    } catch (error) {
+      console.error('❌ Error checking table data:', error.message);
+    } finally {
+      client.release();
+    }
+  }
+
   // מחיקת הטבלאות הישנות (אופציונלי - רק אם רוצים להתחיל מחדש)
   async dropOldTables() {
     const client = await this.pool.connect();
