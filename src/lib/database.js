@@ -4,8 +4,8 @@ class Database {
   constructor() {
     // חיבור זמני עד להקמת מסד נתונים אמיתי
     this.pool = new Pool({
-      connectionString: process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/postgres',
-      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+      connectionString: process.env.DATABASE_URL || 'postgresql://user:password@127.0.0.1:5432/attendance',
+      ssl: false
     });
   }
 
