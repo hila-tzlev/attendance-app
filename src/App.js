@@ -1,10 +1,11 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
-import ManagementScreen from './screens/ManagementScreen';
 import ManualUpdateScreen from './screens/ManualUpdateScreen';
 import ReportScreen from './screens/ReportScreen';
+import ManagementScreen from './screens/ManagementScreen';
+import './App.css';
 
 function App() {
   return (
