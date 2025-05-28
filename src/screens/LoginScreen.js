@@ -82,7 +82,7 @@ const LoginScreen = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
         {error && <div className="error">{error}</div>}
-        <Button onClick={handleLogin}>התחבר</Button>
+        <Button onClick={handleLogin}>התחברות</Button>
       </div>
     </Layout>
   );
