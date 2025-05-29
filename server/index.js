@@ -11,6 +11,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../build')));
 
+// Middleware לטיפול בבקשות API בסביבת פיתוח
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path} - ${new Date().toISOString()}`);
+  next();
+});
+
 // בדיקת חיבור פשוטה
 app.get('/api/health', (req, res) => {
   res.json({ 
@@ -247,6 +253,7 @@ app.post('/api/departments', (req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`🌐 Server accessible at: http://0.0.0.0:${PORT}`);
+  console.log(`🔗 API endpoints available at: /api/*`);
   console.log('✅ Simple server without database - ready to use!');
   console.log('📝 Available test users:');
   tempUsers.forEach(user => {
