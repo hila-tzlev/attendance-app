@@ -79,10 +79,34 @@ const HomeScreen = () => {
     if (!hasClockedIn) {
       // כניסה
       const clockInTime = new Date();
-      localStorage.setItem(`clockIn_${user.employeeId}`, clockInTime.toISOString());
-      setLastClockInTime(clockInTime);
-      setHasClockedIn(true);
-      setToastMessage('כניסה בוצעה בהצלחה');
+
+      fetch('http://localhost:5000/api/attendance/clock-in', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          employeeId: user.employeeId,
+          clockInTime: clockInTime.toISOString(),
+        }),
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+          localStorage.setItem(`clockIn_${user.employeeId}`, clockInTime.toISOString());
+          setLastClockInTime(clockInTime);
+          setHasClockedIn(true);
+          setToastMessage('כניסה בוצעה בהצלחה');
+      })
+      .catch(error => {
+        console.error('There was an error clocking in:', error);
+        setToastMessage('שגיאה בעת ביצוע הכניסה');
+      });
+
 
       // שמירת רשומת נוכחות
       const attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');
@@ -101,11 +125,34 @@ const HomeScreen = () => {
   const confirmClockOut = () => {
     // יציאה
     const clockOutTime = new Date();
-    localStorage.removeItem(`clockIn_${user.employeeId}`);
-    setLastClockInTime(null);
-    setHasClockedIn(false);
-    setShowModal(false);
-    setToastMessage('יציאה בוצעה בהצלחה');
+
+    fetch('http://localhost:5000/api/attendance/clock-out', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        employeeId: user.employeeId,
+        clockOutTime: clockOutTime.toISOString(),
+      }),
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+        localStorage.removeItem(`clockIn_${user.employeeId}`);
+        setLastClockInTime(null);
+        setHasClockedIn(false);
+        setShowModal(false);
+        setToastMessage('יציאה בוצעה בהצלחה');
+    })
+    .catch(error => {
+      console.error('There was an error clocking out:', error);
+      setToastMessage('שגיאה בעת ביצוע היציאה');
+    });
 
     // עדכון רשומת הנוכחות
     const attendanceRecords = JSON.parse(localStorage.getItem('attendanceRecords') || '[]');

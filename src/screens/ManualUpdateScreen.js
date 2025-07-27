@@ -133,16 +133,45 @@ const ManualUpdateScreen = () => {
     return reports.every(report => isReportFullyValid(report));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!areAllReportsValid()) {
       setToastMessage('לא ניתן לשמור דיווחים עם נתונים שגויים או חסרים');
       return;
     }
-
-    setToastMessage('הדיווח נשמר ויועבר לאישור מנהל');
-    setTimeout(() => {
-      navigate('/home');
-    }, 5000);
+  
+    try {
+      // Convert reports to the desired format
+      const reportsToSend = reports.map(report => ({
+        dateIn: report.dateIn,
+        timeIn: report.timeIn,
+        dateOut: report.dateOut,
+        timeOut: report.timeOut,
+      }));
+  
+      // Make the API call to save the manual reports
+      const response = await fetch('http://localhost:5000/api/reports/manual', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(reportsToSend),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      console.log('Manual reports saved:', data);
+  
+      setToastMessage('הדיווח נשמר ויועבר לאישור מנהל');
+      setTimeout(() => {
+        navigate('/home');
+      }, 5000);
+    } catch (error) {
+      console.error('Error saving manual reports:', error);
+      setToastMessage('שגיאה בשמירת הדיווח. אנא נסה שוב.');
+    }
   };
 
   const handleBack = () => {

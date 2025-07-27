@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Input from '../components/Input/Input';
@@ -30,14 +29,14 @@ const LoginScreen = () => {
       setError('נא להזין את פרטי ההתחברות');
       return;
     }
-    
+
     if (!employeeId || !password || !validateIsraeliID(employeeId)) {
       setError('אחד מפרטי ההתחברות שגויים, אנא נסה שוב');
       return;
     }
 
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -53,7 +52,7 @@ const LoginScreen = () => {
         sessionStorage.setItem('employeeId', data.user.employeeId);
         sessionStorage.setItem('userName', data.user.name);
         sessionStorage.setItem('isManager', data.user.isManager);
-        
+
         setError('');
         navigate('/home');
       } else {
