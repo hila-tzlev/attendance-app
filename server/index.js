@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const Database = require('../src/lib/database.js');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -18,42 +19,36 @@ app.use((req, res, next) => {
 });
 
 // בדיקת חיבור פשוטה
-app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    message: 'Server is running',
-    port: PORT,
-    timestamp: new Date().toISOString()
-  });
+app.get('/api/health', async (req, res) => {
+  try {
+    await Database.connect();
+    res.json({ 
+      status: 'OK', 
+      message: 'Server and database are running',
+      port: PORT,
+      timestamp: new Date().toISOString(),
+      database: 'Connected'
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      status: 'ERROR', 
+      message: 'Database connection failed',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
-// משתמשים זמניים במציאות (לבדיקה)
-const tempUsers = [
-  {
-    id: 1,
-    employeeId: '322754672',
-    name: 'מנהל ראשי',
-    password: '123456',
-    isManager: true
-  },
-  {
-    id: 2,
-    employeeId: '123456782',
-    name: 'עובד לדוגמא',
-    password: 'password',
-    isManager: false
-  }
-];
-
-let tempAttendance = [];
-let attendanceIdCounter = 1;
-
 // API Routes for Authentication
-app.post('/api/auth/login', (req, res) => {
+app.post('/api/auth/login', async (req, res) => {
   try {
     const { employeeId, password } = req.body;
 
-    const user = tempUsers.find(u => u.employeeId === employeeId);
+    if (!employeeId || !password) {
+      return res.status(400).json({ error: 'מספר זהות וסיסמה נדרשים' });
+    }
+
+    const user = await Database.getUserByEmployeeId(employeeId);
 
     if (!user) {
       return res.status(401).json({ error: 'משתמש לא נמצא' });
@@ -66,204 +61,215 @@ app.post('/api/auth/login', (req, res) => {
     res.json({
       user: {
         id: user.id,
-        employeeId: user.employeeId,
+        employeeId: user.employee_id,
         name: user.name,
-        isManager: user.isManager
+        isManager: user.is_manager,
+        department: user.department_name || 'לא מוגדר'
       }
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ error: 'שגיאה בהתחברות' });
+    res.status(500).json({ error: 'שגיאה בהתחברות: ' + error.message });
   }
 });
 
 // API Routes for Attendance
-app.post('/api/attendance/clock-in', (req, res) => {
+app.post('/api/attendance/clock-in', async (req, res) => {
   try {
     const { userId, latitude, longitude, isManualEntry, manualReason } = req.body;
     
-    const user = tempUsers.find(u => u.id === parseInt(userId));
-    if (!user) {
-      return res.status(404).json({ error: 'משתמש לא נמצא' });
+    if (!userId) {
+      return res.status(400).json({ error: 'מזהה משתמש נדרש' });
     }
 
-    const record = {
-      id: attendanceIdCounter++,
-      user_id: parseInt(userId),
-      clock_in: new Date().toISOString(),
-      clock_out: null,
-      status: 'APPROVED',
-      is_manual_entry: !!isManualEntry,
-      manual_reason: manualReason || null,
-      latitude: latitude || null,
-      longitude: longitude || null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
+    const record = await Database.clockIn(
+      parseInt(userId), 
+      latitude, 
+      longitude, 
+      !!isManualEntry, 
+      manualReason
+    );
 
-    tempAttendance.push(record);
     res.json(record);
   } catch (error) {
     console.error('Clock-in error:', error);
-    res.status(500).json({ error: 'שגיאה בכניסה' });
+    res.status(500).json({ error: 'שגיאה בכניסה: ' + error.message });
   }
 });
 
-app.post('/api/attendance/clock-out', (req, res) => {
+app.post('/api/attendance/clock-out', async (req, res) => {
   try {
     const { userId, latitude, longitude } = req.body;
     
-    const today = new Date().toDateString();
-    const record = tempAttendance.find(r => 
-      r.user_id === parseInt(userId) && 
-      new Date(r.clock_in).toDateString() === today &&
-      !r.clock_out
-    );
-
-    if (!record) {
-      return res.status(404).json({ error: 'לא נמצא רישום כניסה להיום' });
+    if (!userId) {
+      return res.status(400).json({ error: 'מזהה משתמש נדרש' });
     }
 
-    record.clock_out = new Date().toISOString();
-    record.updated_at = new Date().toISOString();
-    if (latitude) record.latitude = latitude;
-    if (longitude) record.longitude = longitude;
+    const record = await Database.clockOut(parseInt(userId), latitude, longitude);
+
+    if (!record) {
+      return res.status(404).json({ error: 'לא נמצא רישום כניסה פתוח להיום' });
+    }
 
     res.json(record);
   } catch (error) {
     console.error('Clock-out error:', error);
-    res.status(500).json({ error: 'שגיאה ביציאה' });
+    res.status(500).json({ error: 'שגיאה ביציאה: ' + error.message });
   }
 });
 
-app.get('/api/attendance/today/:userId', (req, res) => {
+app.get('/api/attendance/today/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    const today = new Date().toDateString();
     
-    const record = tempAttendance.find(r => 
-      r.user_id === parseInt(userId) && 
-      new Date(r.clock_in).toDateString() === today
-    );
+    if (!userId) {
+      return res.status(400).json({ error: 'מזהה משתמש נדרש' });
+    }
 
+    const record = await Database.getTodayAttendance(parseInt(userId));
     res.json(record || null);
   } catch (error) {
     console.error('Get attendance error:', error);
-    res.status(500).json({ error: 'שגיאה בקבלת נתוני נוכחות' });
+    res.status(500).json({ error: 'שגיאה בקבלת נתוני נוכחות: ' + error.message });
   }
 });
 
 // API Routes for Manual Reports
-app.post('/api/reports/manual', (req, res) => {
+app.post('/api/reports/manual', async (req, res) => {
   try {
     const { userId, clockIn, clockOut, reason, latitude, longitude } = req.body;
     
-    const record = {
-      id: attendanceIdCounter++,
-      user_id: parseInt(userId),
-      clock_in: clockIn,
-      clock_out: clockOut,
-      status: 'PENDING',
-      is_manual_entry: true,
-      manual_reason: reason,
-      latitude: latitude || null,
-      longitude: longitude || null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
+    if (!userId || !clockIn || !clockOut || !reason) {
+      return res.status(400).json({ error: 'כל השדות נדרשים' });
+    }
 
-    tempAttendance.push(record);
+    const record = await Database.createManualReport(
+      parseInt(userId), 
+      clockIn, 
+      clockOut, 
+      reason, 
+      latitude, 
+      longitude
+    );
+
     res.json(record);
   } catch (error) {
     console.error('Manual report error:', error);
-    res.status(500).json({ error: 'שגיאה ביצירת דיווח' });
+    res.status(500).json({ error: 'שגיאה ביצירת דיווח: ' + error.message });
   }
 });
 
-app.get('/api/attendance/logs', (req, res) => {
+app.get('/api/attendance/logs', async (req, res) => {
   try {
-    const { status, isManualEntry } = req.query;
+    const { status, isManualEntry, departmentId } = req.query;
     
-    let filteredLogs = tempAttendance.map(log => {
-      const user = tempUsers.find(u => u.id === log.user_id);
-      return {
-        ...log,
-        name: user ? user.name : 'משתמש לא ידוע',
-        employee_id: user ? user.employeeId : 'לא ידוע'
-      };
-    });
+    const logs = await Database.getAttendanceLogs(
+      status || null,
+      isManualEntry ? isManualEntry === 'true' : null,
+      departmentId ? parseInt(departmentId) : null
+    );
 
-    if (status) {
-      filteredLogs = filteredLogs.filter(log => log.status === status);
-    }
-
-    if (isManualEntry !== undefined) {
-      const isManual = isManualEntry === 'true';
-      filteredLogs = filteredLogs.filter(log => log.is_manual_entry === isManual);
-    }
-
-    filteredLogs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-    res.json(filteredLogs);
+    res.json(logs);
   } catch (error) {
     console.error('Get attendance logs error:', error);
-    res.status(500).json({ error: 'שגיאה בקבלת דיווחי נוכחות' });
+    res.status(500).json({ error: 'שגיאה בקבלת דיווחי נוכחות: ' + error.message });
   }
 });
 
-app.put('/api/attendance/status/:id', (req, res) => {
+app.put('/api/attendance/status/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status, updatedBy } = req.body;
     
-    const record = tempAttendance.find(r => r.id === parseInt(id));
+    if (!id || !status) {
+      return res.status(400).json({ error: 'מזהה וסטטוס נדרשים' });
+    }
+
+    const record = await Database.updateAttendanceStatus(
+      parseInt(id), 
+      status, 
+      updatedBy ? parseInt(updatedBy) : null
+    );
+
     if (!record) {
       return res.status(404).json({ error: 'רישום לא נמצא' });
     }
-
-    record.status = status;
-    record.updated_at = new Date().toISOString();
     
     res.json(record);
   } catch (error) {
     console.error('Update attendance status error:', error);
-    res.status(500).json({ error: 'שגיאה בעדכון סטטוס' });
+    res.status(500).json({ error: 'שגיאה בעדכון סטטוס: ' + error.message });
   }
 });
 
-// API Routes for Departments (זמני)
-app.get('/api/departments', (req, res) => {
-  res.json([
-    { id: 1, name: 'מחלקה כללית' },
-    { id: 2, name: 'משאבי אנוש' },
-    { id: 3, name: 'פיתוח' }
-  ]);
+// API Routes for Departments
+app.get('/api/departments', async (req, res) => {
+  try {
+    const departments = await Database.getDepartments();
+    res.json(departments);
+  } catch (error) {
+    console.error('Get departments error:', error);
+    res.status(500).json({ error: 'שגיאה בקבלת מחלקות: ' + error.message });
+  }
 });
 
-app.post('/api/departments', (req, res) => {
-  const { name } = req.body;
-  const newDept = { 
-    id: Date.now(), 
-    name: name,
-    created_at: new Date().toISOString()
-  };
-  res.json(newDept);
+app.post('/api/departments', async (req, res) => {
+  try {
+    const { name } = req.body;
+    
+    if (!name) {
+      return res.status(400).json({ error: 'שם מחלקה נדרש' });
+    }
+
+    const department = await Database.createDepartment(name);
+    res.json(department);
+  } catch (error) {
+    console.error('Create department error:', error);
+    res.status(500).json({ error: 'שגיאה ביצירת מחלקה: ' + error.message });
+  }
 });
 
-// Initialize server
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`🌐 Server accessible at: http://0.0.0.0:${PORT}`);
-  console.log(`🔗 API endpoints available at: /api/*`);
-  console.log('✅ Simple server without database - ready to use!');
-  console.log('📝 Available test users:');
-  tempUsers.forEach(user => {
-    console.log(`  - ID: ${user.employeeId}, Password: ${user.password}, Manager: ${user.isManager}`);
-  });
-});
+// Initialize database and server
+async function initializeServer() {
+  try {
+    console.log('🔧 Initializing server...');
+    
+    // בדיקת חיבור לדטאבייס
+    await Database.connect();
+    console.log('✅ Database connection successful');
+    
+    // בדיקת טבלאות
+    const tables = await Database.checkTables();
+    console.log(`📋 Found ${tables.length} tables in database`);
+    
+    if (tables.length === 0) {
+      console.log('⚠️ No tables found. Please run: node setup-database.js');
+    }
+    
+    // הפעלת השרת
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`🌐 Server accessible at: http://0.0.0.0:${PORT}`);
+      console.log(`🔗 API endpoints available at: /api/*`);
+      console.log('✅ Server with PostgreSQL database - ready to use!');
+    });
+    
+  } catch (error) {
+    console.error('❌ Server initialization failed:', error.message);
+    console.error('💡 Make sure to:');
+    console.error('   1. Set up PostgreSQL database in Replit');
+    console.error('   2. Add DATABASE_URL to Secrets');
+    console.error('   3. Run: node setup-database.js');
+    process.exit(1);
+  }
+}
 
 // Serve React app for all other routes
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../build/index.html'));
 });
+
+// Start the server
+initializeServer();
 
 module.exports = app;
