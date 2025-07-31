@@ -154,7 +154,14 @@ const ManualUpdateScreen = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(reportsToSend),
+        body: JSON.stringify({
+          userId: sessionStorage.getItem('userId'),
+          clockIn: reports[0].dateIn + 'T' + reports[0].timeIn + ':00',
+          clockOut: reports[0].dateOut + 'T' + reports[0].timeOut + ':00',
+          reason: 'דיווח ידני',
+          latitude: null,
+          longitude: null
+        }),
       });
   
       if (!response.ok) {

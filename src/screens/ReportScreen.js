@@ -22,7 +22,7 @@ const AttendanceReportsScreen = () => {
   const fetchUserReports = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/attendance/logs`);
+      const response = await fetch(`http://localhost:5000/api/attendance/logs`);
       
       if (response.ok) {
         const allReports = await response.json();

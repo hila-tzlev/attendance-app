@@ -86,8 +86,11 @@ const HomeScreen = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          employeeId: user.employeeId,
-          clockInTime: clockInTime.toISOString(),
+          userId: sessionStorage.getItem('userId'),
+          latitude: null,
+          longitude: null,
+          isManualEntry: false,
+          manualReason: null
         }),
       })
       .then(response => {
@@ -132,8 +135,9 @@ const HomeScreen = () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        employeeId: user.employeeId,
-        clockOutTime: clockOutTime.toISOString(),
+        userId: sessionStorage.getItem('userId'),
+        latitude: null,
+        longitude: null
       }),
     })
     .then(response => {
@@ -212,7 +216,7 @@ const HomeScreen = () => {
         </div>
 
         <div className="navigation-section">
-          <Button onClick={() => navigate('/reports')}>
+          <Button onClick={() => navigate('/report-screen')}>
             דוחות נוכחות
           </Button>
 
