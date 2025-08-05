@@ -80,7 +80,7 @@ const HomeScreen = () => {
       // כניסה
       const clockInTime = new Date();
 
-      fetch('http://localhost:5000/api/attendance/clock-in', {
+      fetch('/api/attendance/clock-in', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -129,7 +129,7 @@ const HomeScreen = () => {
     // יציאה
     const clockOutTime = new Date();
 
-    fetch('http://localhost:5000/api/attendance/clock-out', {
+    fetch('/api/attendance/clock-out', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

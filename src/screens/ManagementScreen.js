@@ -11,7 +11,7 @@ const ManagementScreen = () => {
   useEffect(() => {
     const loadPendingApprovals = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/attendance/logs?status=PENDING');
+        const response = await fetch('/api/attendance/logs?status=PENDING');
         if (response.ok) {
           const logs = await response.json();
           setPendingApprovals(logs);
@@ -26,7 +26,7 @@ const ManagementScreen = () => {
 
   const approveReport = async (id) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/attendance/status/${id}`, {
+      const response = await fetch(`/api/attendance/status/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
