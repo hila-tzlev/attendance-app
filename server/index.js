@@ -233,6 +233,8 @@ app.post('/api/departments', async (req, res) => {
 async function initializeServer() {
   try {
     console.log('🔧 Initializing server...');
+    console.log(`🔧 Using PORT: ${PORT}`);
+    console.log(`🔧 DATABASE_URL exists: ${!!process.env.DATABASE_URL}`);
     
     // בדיקת חיבור לדטאבייס
     await Database.connect();
@@ -243,19 +245,30 @@ async function initializeServer() {
     console.log(`📋 Found ${tables.length} tables in database`);
     
     if (tables.length === 0) {
-      console.log('⚠️ No tables found. Please run: node setup-database.js');
+      console.log('⚠️ No tables found. Creating tables...');
+      await Database.createTables();
+      console.log('✅ Tables created');
     }
     
     // הפעלת השרת
-    app.listen(PORT, '0.0.0.0', () => {
+    const server = app.listen(PORT, '0.0.0.0', () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`🌐 Server accessible at: http://0.0.0.0:${PORT}`);
       console.log(`🔗 API endpoints available at: /api/*`);
+      console.log(`🔗 Health check: http://0.0.0.0:${PORT}/api/health`);
       console.log('✅ Server with PostgreSQL database - ready to use!');
       
       // בדיקה נוספת שהפורט הנכון פועל
-      if (PORT !== 5000) {
+      if (PORT != 5000) {
         console.log(`⚠️ Warning: Expected port 5000 but running on ${PORT}`);
+      }
+    });
+    
+    server.on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        console.error(`❌ Port ${PORT} is already in use`);
+      } else {
+        console.error('❌ Server error:', err.message);
       }
     });
     
@@ -264,7 +277,14 @@ async function initializeServer() {
     console.error('💡 Make sure to:');
     console.error('   1. Set up PostgreSQL database in Replit');
     console.error('   2. Add DATABASE_URL to Secrets');
-    console.error('   3. Run: node setup-database.js');
+    console.error('   3. Check if DATABASE_URL is set correctly');
+    
+    // נסה להציג מידע נוסף על השגיאה
+    if (error.message.includes('connect')) {
+      console.error('   → This seems like a database connection issue');
+      console.error('   → Check if DATABASE_URL is set in Secrets');
+    }
+    
     process.exit(1);
   }
 }
