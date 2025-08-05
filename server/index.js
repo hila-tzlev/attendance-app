@@ -252,6 +252,11 @@ async function initializeServer() {
       console.log(`🌐 Server accessible at: http://0.0.0.0:${PORT}`);
       console.log(`🔗 API endpoints available at: /api/*`);
       console.log('✅ Server with PostgreSQL database - ready to use!');
+      
+      // בדיקה נוספת שהפורט הנכון פועל
+      if (PORT !== 5000) {
+        console.log(`⚠️ Warning: Expected port 5000 but running on ${PORT}`);
+      }
     });
     
   } catch (error) {
