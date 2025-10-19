@@ -53,6 +53,14 @@
   .back-arrow {
     font-size: 20px;
     padding: 6px;
+    top: auto;
+    bottom: 20px;
+    right: 20px;
+  }
+  
+  .back-arrow::after {
+    bottom: 100%;
+    margin-bottom: 5px;
   }
 }
 

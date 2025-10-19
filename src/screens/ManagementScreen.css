@@ -53,6 +53,14 @@
   .back-arrow {
     font-size: 20px;
     padding: 6px;
+    top: auto;
+    bottom: 20px;
+    right: 20px;
+  }
+  
+  .back-arrow::after {
+    bottom: 100%;
+    margin-bottom: 5px;
   }
 }
 
@@ -162,13 +170,18 @@
 
 .approve-btn,
 .reject-btn {
-  padding: 8px 16px;
+  width: 36px;
+  height: 36px;
   border: none;
-  border-radius: 6px;
-  font-size: 14px;
+  border-radius: 50%;
+  font-size: 18px;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
 .approve-btn {
@@ -178,6 +191,7 @@
 
 .approve-btn:hover {
   background: #218838;
+  transform: scale(1.1);
 }
 
 .reject-btn {
@@ -187,6 +201,32 @@
 
 .reject-btn:hover {
   background: #c82333;
+  transform: scale(1.1);
+}
+
+.approve-btn::after,
+.reject-btn::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  margin-bottom: 5px;
+  font-weight: normal;
+}
+
+.approve-btn:hover::after,
+.reject-btn:hover::after {
+  opacity: 1;
 }
 
 .location-link {

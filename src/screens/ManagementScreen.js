@@ -264,14 +264,16 @@ const ManagementScreen = () => {
                         <button 
                           className="approve-btn"
                           onClick={() => approveReport(report.id)}
+                          title="אשר"
                         >
-                          ✓ אשר
+                          ✓
                         </button>
                         <button 
                           className="reject-btn"
                           onClick={() => rejectReport(report.id)}
+                          title="דחה"
                         >
-                          ✕ דחה
+                          ✕
                         </button>
                       </div>
                     </td>
