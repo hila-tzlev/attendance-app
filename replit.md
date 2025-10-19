@@ -1,0 +1,191 @@
+# Attendance Management System
+
+## Overview
+
+This is a web-based attendance tracking system for employee time management. The application allows employees to clock in/out, submit manual attendance reports, and enables managers to review and approve attendance records. Built as a React single-page application with an Express backend and PostgreSQL database.
+
+**Primary Purpose:** Enable employees to track their work hours through automated clock-in/out functionality or manual entry, while providing managers with approval workflows for attendance records.
+
+**Key Features:**
+- Employee authentication with Israeli ID validation
+- Clock in/out with geolocation tracking
+- Manual attendance report submission
+- Manager approval workflow for manual entries
+- Attendance history viewing
+- RTL (right-to-left) Hebrew language support
+
+## User Preferences
+
+Preferred communication style: Simple, everyday language.
+
+## System Architecture
+
+### Frontend Architecture
+
+**Technology Stack:**
+- React 19.0.0 (Create React App)
+- React Router DOM 6.30.0 for client-side routing
+- Framer Motion 12.4.10 for animations
+- Axios 1.8.1 for HTTP requests
+- React Toastify for notifications
+
+**Component Structure:**
+- **Layout System:** Centralized `Layout` component provides consistent header (logo), content area, and footer across all screens
+- **Screen Components:** Dedicated screen components for each major view (Login, Home, ManualUpdate, Report, Management)
+- **Reusable UI Components:** Button, Input (with password visibility toggle), ConfirmationModal, ToastNotification, ReportCard
+- **Styling Approach:** Component-scoped CSS files with global styles in `global.css`
+
+**State Management:**
+- Local component state using React hooks (useState, useEffect)
+- SessionStorage for user authentication state (employeeId, userName, isManager, userId)
+- LocalStorage for active clock-in tracking
+
+**Design Decisions:**
+- RTL layout for Hebrew language support (dir="rtl" on HTML element)
+- Light theme enforced with #F0F8FF background color
+- Mobile-first responsive design with media queries
+- Font Awesome icons for UI elements
+- Israeli ID validation implemented client-side
+
+### Backend Architecture
+
+**Technology Stack:**
+- Node.js with Express 4.18.2
+- PostgreSQL (pg 8.16.3) for data persistence
+- CORS enabled for cross-origin requests
+- Static file serving for production build
+
+**Recent Changes (October 2025):**
+- Fixed package.json scripts to work with Linux environment (removed Windows-specific 'set' command)
+- Changed Express from version 5.x to 4.18.2 to resolve path-to-regexp compatibility issues
+- Verified database connection and schema setup
+- Built production version of React application
+- Configured workflow to run server on port 5000
+
+**API Design:**
+- RESTful API endpoints under `/api` prefix
+- Authentication endpoint: POST `/api/auth/login`
+- Attendance endpoints: GET/POST `/api/attendance/logs`, PUT `/api/attendance/status/:id`
+- Health check endpoint: GET `/api/health`
+
+**Database Layer:**
+- Custom Database class (`src/lib/database.js`) wrapping pg Pool
+- Connection pooling with SSL support for Replit PostgreSQL
+- Schema creation and sample data scripts included
+
+**Database Schema:**
+
+**users table:**
+- `id` (SERIAL PRIMARY KEY): Auto-incrementing user identifier
+- `employee_id` (VARCHAR): Israeli national ID
+- `name` (VARCHAR): Employee full name
+- `password` (VARCHAR): Hashed password
+- `is_manager` (BOOLEAN): Manager role flag
+- `department_id` (FOREIGN KEY): Links to departments table
+- `created_at` (TIMESTAMP): Record creation timestamp
+
+**departments table:**
+- `id` (SERIAL PRIMARY KEY): Department identifier
+- `name` (VARCHAR UNIQUE): Department name
+- `created_at` (TIMESTAMP): Record creation timestamp
+
+**attendance_logs table:**
+- `id` (SERIAL PRIMARY KEY): Attendance record identifier
+- `user_id` (FOREIGN KEY): References users table
+- `clock_in` (TIMESTAMP): Entry time
+- `clock_out` (TIMESTAMP): Exit time (nullable for active sessions)
+- `status` (VARCHAR): Record status - "PENDING", "APPROVED", or "REJECTED"
+- `is_manual_entry` (BOOLEAN): Distinguishes manual vs automatic entries
+- `manual_reason` (TEXT): Justification for manual entries
+- `latitude` (DECIMAL): GPS latitude coordinate
+- `longitude` (DECIMAL): GPS longitude coordinate
+- `created_at` (TIMESTAMP): Record creation timestamp
+- `updated_at` (TIMESTAMP): Last modification timestamp
+- `updated_by` (FOREIGN KEY): User who last modified the record
+
+**Architectural Patterns:**
+- Separation of concerns: Database logic isolated in dedicated module
+- Error handling with try-catch blocks and user-friendly error messages
+- Environment-based configuration (DATABASE_URL from environment variables)
+
+### Authentication & Authorization
+
+**Authentication Flow:**
+- Israeli ID validation (Luhn algorithm implementation)
+- Password-based authentication (passwords stored in database)
+- Session management via SessionStorage
+- Automatic redirect to login if not authenticated
+
+**Authorization:**
+- Role-based access control (manager vs regular employee)
+- Managers can approve/reject manual attendance entries
+- Employees can only view and submit their own records
+
+### Data Flow
+
+1. **Clock In/Out Flow:**
+   - User initiates clock-in from HomeScreen
+   - Geolocation captured (if available)
+   - Record saved to attendance_logs with status "APPROVED"
+   - LocalStorage tracks active clock-in state
+   - Timer displays elapsed time
+
+2. **Manual Entry Flow:**
+   - User submits manual attendance report with date/time ranges
+   - Record saved with status "PENDING" and is_manual_entry=true
+   - Manager reviews pending records in ManagementScreen
+   - Manager approves/rejects, updating status and updated_by fields
+
+3. **Report Viewing Flow:**
+   - User requests attendance history
+   - Backend filters records by user_id
+   - Frontend displays records with formatted dates/times
+
+## External Dependencies
+
+### Third-Party Services
+
+**Database:**
+- PostgreSQL hosted on Replit
+- Connection via DATABASE_URL environment variable
+- SSL connection with `rejectUnauthorized: false`
+
+### External Libraries
+
+**Frontend:**
+- `react-router-dom`: Client-side routing and navigation
+- `framer-motion`: Animation library for UI transitions
+- `axios`: HTTP client for API communication
+- `react-toastify`: Toast notification system
+- `localforage`: Offline storage (installed but may not be actively used)
+- Font Awesome CDN: Icon library loaded from CDN
+
+**Backend:**
+- `express`: Web server framework
+- `cors`: Cross-origin resource sharing middleware
+- `pg`: PostgreSQL client for Node.js
+
+### Build Tools
+
+- Create React App (react-scripts 5.0.1) for development and production builds
+- Webpack bundling (via CRA)
+- Babel transpilation (via CRA)
+
+### Testing Dependencies
+
+- @testing-library/react
+- @testing-library/jest-dom
+- @testing-library/dom
+- @testing-library/user-event
+
+### Environment Configuration
+
+**Required Environment Variables:**
+- `DATABASE_URL`: PostgreSQL connection string (format: `postgresql://user:password@host:port/database`)
+- `PORT`: Server port (defaults to 5000)
+
+### Asset Dependencies
+
+- Logo image: `logoTzohar.png` in `src/assets/images/`
+- Hebrew font: Alef from Google Fonts (loaded via HTML link tag)
+- Font Awesome CSS from CDN
