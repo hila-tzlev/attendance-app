@@ -68,11 +68,16 @@ Preferred communication style: Simple, everyday language.
 - **GPS Location Tracking:** Implemented geolocation capture for both automatic clock-in/out and manual reports using browser Geolocation API
 - **Location Display in Management:** Added GPS coordinates column in management approval table with clickable links to Google Maps
 - **UI/UX Improvements:** 
-  - Added consistent back arrow button (← חזור) in top-right corner of all screens (Management, Reports, Manual Update)
+  - Replaced back arrow buttons with minimal icon (←) without border, showing "חזרה" tooltip on hover (desktop only)
+  - Back arrow is fully responsive - smaller font size on mobile devices
+  - Implemented tabbed interface in Management screen with two tabs:
+    * "📊 הדיווחים שלי" - Shows manager's personal attendance reports
+    * "👥 ניהול עובדים" - Shows pending employee reports for approval
+  - Tabs are responsive: horizontal layout on desktop, vertical on mobile (<768px)
   - Centered all page headers for better visual balance
   - Improved button layouts and positioning
   - Enhanced responsive design for mobile devices
-- **Code Quality:** Removed unused imports, fixed React hooks warnings with useCallback, optimized build output
+- **Code Quality:** Removed unused imports, fixed React hooks warnings, optimized build output
 
 **API Design:**
 - RESTful API endpoints under `/api` prefix
