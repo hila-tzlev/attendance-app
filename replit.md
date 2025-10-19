@@ -67,13 +67,14 @@ Preferred communication style: Simple, everyday language.
 - **Mandatory Reason Field:** Manual reports now require a textarea field explaining the reason for manual entry (enforced in validation)
 - **GPS Location Tracking:** Implemented geolocation capture for both automatic clock-in/out and manual reports using browser Geolocation API
 - **Location Display in Management:** Added GPS coordinates column in management approval table with clickable links to Google Maps
-- **Modern Table Design:**
+- **Minimalist Table Design:**
   - Centered tables with max-width of 900px for better readability
-  - New color scheme: light blue headers (#EAF3FF), dark blue text (#003087), consistent borders (#dddddd)
-  - Enhanced shadows and hover effects for better user experience
+  - Clean color scheme: light blue headers (#EAF3FF), dark blue text (#003087), subtle borders (#dddddd)
+  - Reduced shadows and minimal visual weight for modern aesthetic
+  - Simple, clean icons (✓/✕) for approve/reject actions
   - Improved visual hierarchy with proper spacing
 - **Icon-Based Actions:**
-  - Replaced text-based approve/reject buttons with icon buttons (✓/✕)
+  - Clean icon buttons (✓/✕) replacing text-heavy buttons
   - Added tooltips for accessibility on desktop (hidden on mobile)
   - Circular button design with smooth hover transitions and scaling effects
   - Full text labels on mobile cards ("✓ אשר" / "✕ דחה") for better usability
@@ -83,12 +84,18 @@ Preferred communication style: Simple, everyday language.
   - Clear visual separation with labeled rows (label on right, value on left)
   - Status and type badges integrated into card headers
   - Action buttons displayed at bottom of cards with proper spacing
-- **Tab System in Management Screen:**
-  - Dual-tab interface separating manager's personal reports from employee approval workflow
-  - Tabs: "📊 הדיווחים שלי" (My Reports) and "👥 ניהול עובדים" (Employee Management)
+- **Three-Tab Management System:**
+  - Tab 1: "📊 הדיווחים שלי" (My Reports) - Manager's personal attendance reports
+  - Tab 2: "✅ דיווחים ממתינים" (Pending Reports) - Employee reports awaiting approval
+  - Tab 3: "👥 רשימת עובדים" (Employee List) - List of all employees with details (name, ID, department, role, join date)
   - Responsive tab layout: horizontal on desktop, vertical on mobile
   - Smooth transitions with fade-in animations between tabs
   - Green loader component for better loading states
+- **Self-Approval Prevention:**
+  - Client-side validation: Manager's own pending reports are filtered out from the approval list
+  - Server-side validation: API returns 403 error if manager attempts to approve their own reports
+  - User-friendly alerts when self-approval is attempted
+  - Reports automatically removed from pending list after approval/rejection
 - **Navigation Improvements:**
   - Minimalist back arrow (←) positioned at top-right on desktop
   - Auto-repositions to bottom-center on mobile for thumb accessibility
@@ -103,6 +110,7 @@ Preferred communication style: Simple, everyday language.
 - RESTful API endpoints under `/api` prefix
 - Authentication endpoint: POST `/api/auth/login`
 - Attendance endpoints: GET/POST `/api/attendance/logs`, PUT `/api/attendance/status/:id`
+- Employee endpoints: GET `/api/employees`
 - Health check endpoint: GET `/api/health`
 
 **Database Layer:**
