@@ -10,6 +10,7 @@ const ManagementScreen = () => {
   const [activeTab, setActiveTab] = useState('myReports');
   const [pendingApprovals, setPendingApprovals] = useState([]);
   const [myReports, setMyReports] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const employeeId = sessionStorage.getItem('employeeId');
   const userId = sessionStorage.getItem('userId');
@@ -17,8 +18,10 @@ const ManagementScreen = () => {
   useEffect(() => {
     if (activeTab === 'myReports') {
       loadMyReports();
-    } else {
+    } else if (activeTab === 'employeeManagement') {
       loadPendingApprovals();
+    } else if (activeTab === 'employeeList') {
+      loadEmployees();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
@@ -45,7 +48,8 @@ const ManagementScreen = () => {
       const response = await fetch('/api/attendance/logs?status=PENDING');
       if (response.ok) {
         const logs = await response.json();
-        setPendingApprovals(logs);
+        const filteredLogs = logs.filter(log => log.user_id !== parseInt(userId));
+        setPendingApprovals(filteredLogs);
       }
     } catch (error) {
       console.error('Error loading pending approvals:', error);
@@ -54,8 +58,29 @@ const ManagementScreen = () => {
     }
   };
 
+  const loadEmployees = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/employees');
+      if (response.ok) {
+        const data = await response.json();
+        setEmployees(data);
+      }
+    } catch (error) {
+      console.error('Error loading employees:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const approveReport = async (id) => {
     try {
+      const report = pendingApprovals.find(r => r.id === id);
+      if (report && report.user_id === parseInt(userId)) {
+        alert('לא ניתן לאשר דיווחים עצמיים');
+        return;
+      }
+
       const response = await fetch(`/api/attendance/status/${id}`, {
         method: 'PUT',
         headers: {
@@ -70,6 +95,11 @@ const ManagementScreen = () => {
       if (response.ok) {
         setPendingApprovals(prev => prev.filter(report => report.id !== id));
         alert('דיווח אושר בהצלחה!');
+      } else if (response.status === 403) {
+        const error = await response.json();
+        alert(error.error || 'לא ניתן לאשר דיווחים עצמיים');
+      } else {
+        alert('שגיאה באישור הדיווח');
       }
     } catch (error) {
       console.error('Error approving report:', error);
@@ -79,6 +109,12 @@ const ManagementScreen = () => {
 
   const rejectReport = async (id) => {
     try {
+      const report = pendingApprovals.find(r => r.id === id);
+      if (report && report.user_id === parseInt(userId)) {
+        alert('לא ניתן לדחות דיווחים עצמיים');
+        return;
+      }
+
       const response = await fetch(`/api/attendance/status/${id}`, {
         method: 'PUT',
         headers: {
@@ -179,7 +215,13 @@ const ManagementScreen = () => {
             className={`tab ${activeTab === 'employeeManagement' ? 'active' : ''}`}
             onClick={() => setActiveTab('employeeManagement')}
           >
-            👥 ניהול עובדים
+            ✅ דיווחים ממתינים
+          </button>
+          <button 
+            className={`tab ${activeTab === 'employeeList' ? 'active' : ''}`}
+            onClick={() => setActiveTab('employeeList')}
+          >
+            👥 רשימת עובדים
           </button>
         </div>
 
@@ -376,6 +418,72 @@ const ManagementScreen = () => {
                   >
                     ✕ דחה
                   </button>
+                </div>
+              </div>
+            ))}
+          </div>
+          </>
+          )}
+          </>
+        )}
+        </div>
+
+        <div className={`tab-content ${activeTab === 'employeeList' ? 'active' : ''}`}>
+        {activeTab === 'employeeList' && (
+          <>
+          {loading ? (
+            <Loader size="medium" color="green" />
+          ) : employees.length === 0 ? (
+            <p className="no-data">אין עובדים במערכת</p>
+          ) : (
+            <>
+            <div className="table-wrapper">
+              <table className="management-table">
+              <thead>
+                <tr>
+                  <th>שם</th>
+                  <th>ת.ז</th>
+                  <th>מחלקה</th>
+                  <th>תפקיד</th>
+                  <th>תאריך הצטרפות</th>
+                </tr>
+              </thead>
+              <tbody>
+                {employees.map((employee) => (
+                  <tr key={employee.id}>
+                    <td>{employee.name}</td>
+                    <td>{employee.employee_id}</td>
+                    <td>{employee.department_name || '-'}</td>
+                    <td>{employee.is_manager ? 'מנהל' : 'עובד'}</td>
+                    <td>{formatDate(employee.created_at)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="report-cards-container">
+            {employees.map((employee) => (
+              <div key={employee.id} className="report-card">
+                <div className="report-card-header">
+                  <span className="report-card-title">{employee.name}</span>
+                  {employee.is_manager ? (
+                    <span className="status-badge status-approved">מנהל</span>
+                  ) : (
+                    <span className="auto-badge">עובד</span>
+                  )}
+                </div>
+                <div className="report-card-row">
+                  <span className="report-card-label">ת.ז:</span>
+                  <span className="report-card-value">{employee.employee_id}</span>
+                </div>
+                <div className="report-card-row">
+                  <span className="report-card-label">מחלקה:</span>
+                  <span className="report-card-value">{employee.department_name || '-'}</span>
+                </div>
+                <div className="report-card-row">
+                  <span className="report-card-label">תאריך הצטרפות:</span>
+                  <span className="report-card-value">{formatDate(employee.created_at)}</span>
                 </div>
               </div>
             ))}

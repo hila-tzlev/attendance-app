@@ -184,6 +184,16 @@ app.put('/api/attendance/status/:id', async (req, res) => {
       return res.status(400).json({ error: 'מזהה וסטטוס נדרשים' });
     }
 
+    // בדיקה למניעת self-approval
+    const existingRecord = await Database.getAttendanceById(parseInt(id));
+    if (!existingRecord) {
+      return res.status(404).json({ error: 'רישום לא נמצא' });
+    }
+
+    if (existingRecord.user_id === parseInt(updatedBy)) {
+      return res.status(403).json({ error: 'לא ניתן לאשר דיווחים עצמיים' });
+    }
+
     const record = await Database.updateAttendanceStatus(
       parseInt(id), 
       status, 
@@ -198,6 +208,17 @@ app.put('/api/attendance/status/:id', async (req, res) => {
   } catch (error) {
     console.error('Update attendance status error:', error);
     res.status(500).json({ error: 'שגיאה בעדכון סטטוס: ' + error.message });
+  }
+});
+
+// API Routes for Employees
+app.get('/api/employees', async (req, res) => {
+  try {
+    const employees = await Database.getEmployees();
+    res.json(employees);
+  } catch (error) {
+    console.error('Get employees error:', error);
+    res.status(500).json({ error: 'שגיאה בקבלת עובדים: ' + error.message });
   }
 });
 

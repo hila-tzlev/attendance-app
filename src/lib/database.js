@@ -236,6 +236,19 @@ class Database {
     }
   }
 
+  async getAttendanceById(attendanceId) {
+    const client = await this.pool.connect();
+    try {
+      const result = await client.query(
+        'SELECT * FROM attendance_logs WHERE id = $1',
+        [attendanceId]
+      );
+      return result.rows[0];
+    } finally {
+      client.release();
+    }
+  }
+
   async updateAttendanceStatus(attendanceId, status, updatedBy) {
     const client = await this.pool.connect();
     try {
@@ -244,6 +257,23 @@ class Database {
         [status, updatedBy, attendanceId]
       );
       return result.rows[0];
+    } finally {
+      client.release();
+    }
+  }
+
+  async getEmployees() {
+    const client = await this.pool.connect();
+    try {
+      const result = await client.query(`
+        SELECT u.id, u.name, u.employee_id, u.is_manager, 
+               d.name as department_name, u.department_id,
+               u.created_at
+        FROM users u 
+        LEFT JOIN departments d ON u.department_id = d.id 
+        ORDER BY u.name
+      `);
+      return result.rows;
     } finally {
       client.release();
     }

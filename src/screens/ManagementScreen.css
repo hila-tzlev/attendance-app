@@ -145,36 +145,45 @@
   overflow-x: auto;
   background: white;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 48, 135, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 48, 135, 0.08);
   max-width: 900px;
-  margin: 0 auto;
+  margin: 24px auto;
+  border: 1px solid #e8eef7;
 }
 
 .management-table {
   width: 100%;
   border-collapse: collapse;
+  font-size: 15px;
 }
 
 .management-table thead {
   background: #EAF3FF;
   color: #003087;
+  height: 48px;
 }
 
 .management-table th {
-  padding: 15px;
+  padding: 14px 20px;
   text-align: right;
-  font-weight: bold;
-  font-size: 16px;
-  border-bottom: 2px solid rgba(0, 48, 135, 0.13);
+  font-weight: 600;
+  font-size: 15px;
+  border-bottom: 1px solid #d9e3f7;
+  line-height: 22px;
 }
 
 .management-table tbody tr {
-  border-bottom: 1px solid #dddddd;
+  border-bottom: 1px solid #f0f0f0;
   background: white;
+  height: 52px;
+}
+
+.management-table tbody tr:nth-child(even) {
+  background: #f9fbff;
 }
 
 .management-table tbody tr:hover {
-  background: #f5f5f5;
+  background: #f5f8ff;
 }
 
 .management-table tbody tr:last-child {
@@ -182,8 +191,15 @@
 }
 
 .management-table td {
-  padding: 15px 10px;
+  padding: 14px 20px;
   text-align: right;
+  color: #0f1f3d;
+  font-weight: 500;
+  line-height: 22px;
+}
+
+.management-table td:first-child {
+  font-weight: 600;
   color: #003087;
 }
 
@@ -195,38 +211,39 @@
 
 .approve-btn,
 .reject-btn {
-  width: 36px;
-  height: 36px;
-  border: none;
-  border-radius: 50%;
-  font-size: 18px;
-  font-weight: bold;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #d0d9ed;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: normal;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+  background: white;
 }
 
 .approve-btn {
-  background: #28a745;
-  color: white;
+  color: #28a745;
 }
 
 .approve-btn:hover {
-  background: #218838;
-  transform: scale(1.1);
+  background: #f0f9f4;
+  border-color: #28a745;
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.1);
 }
 
 .reject-btn {
-  background: #dc3545;
-  color: white;
+  color: #dc3545;
 }
 
 .reject-btn:hover {
-  background: #c82333;
-  transform: scale(1.1);
+  background: #fef5f6;
+  border-color: #dc3545;
+  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.1);
 }
 
 .approve-btn::after,
@@ -272,45 +289,45 @@
 }
 
 .status-badge {
-  padding: 5px 15px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: bold;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 500;
   display: inline-block;
 }
 
 .status-approved {
-  background: #d4edda;
-  color: #155724;
+  background: #e9f6ef;
+  color: #1f7a3d;
 }
 
 .status-pending {
-  background: #fff3cd;
-  color: #856404;
+  background: #fff8e6;
+  color: #b97820;
 }
 
 .status-rejected {
-  background: #f8d7da;
-  color: #721c24;
+  background: #fdecec;
+  color: #ba2b3d;
 }
 
 .manual-badge {
-  background: #cce5ff;
-  color: #004085;
-  padding: 5px 15px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: bold;
+  background: #e9f6ff;
+  color: #0066cc;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 500;
   display: inline-block;
 }
 
 .auto-badge {
-  background: #d1ecf1;
-  color: #0c5460;
-  padding: 5px 15px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: bold;
+  background: #f0f0f5;
+  color: #5a5a70;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 500;
   display: inline-block;
 }
 
