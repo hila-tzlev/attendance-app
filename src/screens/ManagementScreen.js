@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout/Layout';
+import Loader from '../components/Loader/Loader';
 import './ManagementScreen.css';
 
 const ManagementScreen = () => {
@@ -182,10 +183,11 @@ const ManagementScreen = () => {
           </button>
         </div>
 
-        {activeTab === 'myReports' ? (
-          // טאב הדיווחים שלי
-          loading ? (
-            <p className="loading-text">טוען נתונים...</p>
+        <div className={`tab-content ${activeTab === 'myReports' ? 'active' : ''}`}>
+        {activeTab === 'myReports' && (
+          <>
+          {loading ? (
+            <Loader size="medium" color="green" />
           ) : myReports.length === 0 ? (
             <p className="no-data">אין דוחות נוכחות</p>
           ) : (
@@ -225,11 +227,16 @@ const ManagementScreen = () => {
                 </tbody>
               </table>
             </div>
-          )
-        ) : (
-          // טאב ניהול עובדים
-          loading ? (
-            <p className="loading-text">טוען נתונים...</p>
+          )}
+          </>
+        )}
+        </div>
+        
+        <div className={`tab-content ${activeTab === 'employeeManagement' ? 'active' : ''}`}>
+        {activeTab === 'employeeManagement' && (
+          <>
+          {loading ? (
+            <Loader size="medium" color="green" />
           ) : pendingApprovals.length === 0 ? (
             <p className="no-data">אין דיווחים ממתינים לאישור</p>
           ) : (
@@ -282,8 +289,10 @@ const ManagementScreen = () => {
               </tbody>
             </table>
           </div>
-          )
+          )}
+          </>
         )}
+        </div>
       </div>
     </Layout>
   );
