@@ -6,13 +6,36 @@ import './ManagementScreen.css';
 
 const ManagementScreen = () => {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('myReports');
   const [pendingApprovals, setPendingApprovals] = useState([]);
+  const [myReports, setMyReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const employeeId = sessionStorage.getItem('employeeId');
+  const userId = sessionStorage.getItem('userId');
 
   useEffect(() => {
-    loadPendingApprovals();
-  }, []);
+    if (activeTab === 'myReports') {
+      loadMyReports();
+    } else {
+      loadPendingApprovals();
+    }
+  }, [activeTab]);
+
+  const loadMyReports = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/attendance/logs');
+      if (response.ok) {
+        const allReports = await response.json();
+        const userReports = allReports.filter(report => report.user_id === parseInt(userId));
+        setMyReports(userReports);
+      }
+    } catch (error) {
+      console.error('Error loading my reports:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const loadPendingApprovals = async () => {
     try {
@@ -114,6 +137,24 @@ const ManagementScreen = () => {
     return null;
   }
 
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'APPROVED': return 'מאושר';
+      case 'PENDING': return 'ממתין';
+      case 'REJECTED': return 'נדחה';
+      default: return status;
+    }
+  };
+
+  const getStatusClass = (status) => {
+    switch (status) {
+      case 'APPROVED': return 'status-approved';
+      case 'PENDING': return 'status-pending';
+      case 'REJECTED': return 'status-rejected';
+      default: return '';
+    }
+  };
+
   return (
     <Layout>
       <div className="management-container">
@@ -122,16 +163,77 @@ const ManagementScreen = () => {
         </button>
         
         <div className="management-header">
-          <h1>ניהול - אישור דיווחים</h1>
+          <h1>ניהול</h1>
         </div>
 
-        {loading ? (
-          <p className="loading-text">טוען נתונים...</p>
-        ) : pendingApprovals.length === 0 ? (
-          <p className="no-data">אין דיווחים ממתינים לאישור</p>
+        <div className="tabs-container">
+          <button 
+            className={`tab ${activeTab === 'myReports' ? 'active' : ''}`}
+            onClick={() => setActiveTab('myReports')}
+          >
+            📊 הדיווחים שלי
+          </button>
+          <button 
+            className={`tab ${activeTab === 'employeeManagement' ? 'active' : ''}`}
+            onClick={() => setActiveTab('employeeManagement')}
+          >
+            👥 ניהול עובדים
+          </button>
+        </div>
+
+        {activeTab === 'myReports' ? (
+          // טאב הדיווחים שלי
+          loading ? (
+            <p className="loading-text">טוען נתונים...</p>
+          ) : myReports.length === 0 ? (
+            <p className="no-data">אין דוחות נוכחות</p>
+          ) : (
+            <div className="table-wrapper">
+              <table className="management-table">
+                <thead>
+                  <tr>
+                    <th>תאריך</th>
+                    <th>שעת כניסה</th>
+                    <th>שעת יציאה</th>
+                    <th>סה"כ שעות</th>
+                    <th>סטטוס</th>
+                    <th>סוג</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {myReports.map((report) => (
+                    <tr key={report.id}>
+                      <td>{formatDate(report.clock_in)}</td>
+                      <td>{formatTime(report.clock_in)}</td>
+                      <td>{report.clock_out ? formatTime(report.clock_out) : '-'}</td>
+                      <td>{calculateWorkHours(report.clock_in, report.clock_out)}</td>
+                      <td>
+                        <span className={`status-badge ${getStatusClass(report.status)}`}>
+                          {getStatusText(report.status)}
+                        </span>
+                      </td>
+                      <td>
+                        {report.is_manual_entry ? (
+                          <span className="manual-badge">ידני</span>
+                        ) : (
+                          <span className="auto-badge">אוטומטי</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )
         ) : (
-          <div className="table-wrapper">
-            <table className="management-table">
+          // טאב ניהול עובדים
+          loading ? (
+            <p className="loading-text">טוען נתונים...</p>
+          ) : pendingApprovals.length === 0 ? (
+            <p className="no-data">אין דיווחים ממתינים לאישור</p>
+          ) : (
+            <div className="table-wrapper">
+              <table className="management-table">
               <thead>
                 <tr>
                   <th>עובד</th>
@@ -177,6 +279,7 @@ const ManagementScreen = () => {
               </tbody>
             </table>
           </div>
+          )
         )}
       </div>
     </Layout>

@@ -60,12 +60,44 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .management-header h1 {
   color: #003087;
   margin: 0;
+}
+
+.tabs-container {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #E6F0FA;
+}
+
+.tab {
+  padding: 12px 30px;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #003087;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  background: #F0F8FF;
+  border-bottom-color: #0052CC;
+}
+
+.tab.active {
+  border-bottom-color: #003087;
+  color: #003087;
+  background: #F0F8FF;
 }
 
 .loading-text,
@@ -170,6 +202,49 @@
   text-decoration: underline;
 }
 
+.status-badge {
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.status-approved {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-rejected {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.manual-badge {
+  background: #cce5ff;
+  color: #004085;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.auto-badge {
+  background: #d1ecf1;
+  color: #0c5460;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  display: inline-block;
+}
+
 @media (max-width: 1024px) {
   .management-table {
     font-size: 14px;
@@ -182,5 +257,23 @@
   
   .action-buttons {
     flex-direction: column;
+  }
+}
+
+@media (max-width: 768px) {
+  .tabs-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 5px;
+  }
+  
+  .tab {
+    padding: 10px 20px;
+    font-size: 14px;
+    text-align: center;
+  }
+  
+  .management-header h1 {
+    font-size: 24px;
   }
 }
