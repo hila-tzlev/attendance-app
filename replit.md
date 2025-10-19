@@ -55,12 +55,24 @@ Preferred communication style: Simple, everyday language.
 - CORS enabled for cross-origin requests
 - Static file serving for production build
 
-**Recent Changes (October 2025):**
+**Recent Changes (October 19, 2025):**
 - Fixed package.json scripts to work with Linux environment (removed Windows-specific 'set' command)
 - Changed Express from version 5.x to 4.18.2 to resolve path-to-regexp compatibility issues
 - Verified database connection and schema setup
 - Built production version of React application
 - Configured workflow to run server on port 5000
+
+**Latest Improvements (October 19, 2025):**
+- **Date/Time Validation:** Added validation to prevent manual reporting of future dates/times - input fields now have `max` attribute set to current date, and runtime validation blocks future entries
+- **Mandatory Reason Field:** Manual reports now require a textarea field explaining the reason for manual entry (enforced in validation)
+- **GPS Location Tracking:** Implemented geolocation capture for both automatic clock-in/out and manual reports using browser Geolocation API
+- **Location Display in Management:** Added GPS coordinates column in management approval table with clickable links to Google Maps
+- **UI/UX Improvements:** 
+  - Added consistent back arrow button (← חזור) in top-right corner of all screens (Management, Reports, Manual Update)
+  - Centered all page headers for better visual balance
+  - Improved button layouts and positioning
+  - Enhanced responsive design for mobile devices
+- **Code Quality:** Removed unused imports, fixed React hooks warnings with useCallback, optimized build output
 
 **API Design:**
 - RESTful API endpoints under `/api` prefix
@@ -125,21 +137,33 @@ Preferred communication style: Simple, everyday language.
 
 1. **Clock In/Out Flow:**
    - User initiates clock-in from HomeScreen
-   - Geolocation captured (if available)
-   - Record saved to attendance_logs with status "APPROVED"
+   - Browser requests geolocation permission (if not already granted)
+   - Geolocation coordinates (latitude/longitude) captured via navigator.geolocation API
+   - Record saved to attendance_logs with status "APPROVED" and GPS coordinates
    - LocalStorage tracks active clock-in state
    - Timer displays elapsed time
+   - On clock-out: GPS location captured again and record updated
 
 2. **Manual Entry Flow:**
-   - User submits manual attendance report with date/time ranges
-   - Record saved with status "PENDING" and is_manual_entry=true
+   - User opens Manual Update screen
+   - Browser captures GPS location in background
+   - User fills date/time fields (validation prevents future dates)
+   - User must provide reason in mandatory textarea field
+   - System validates:
+     * All date/time fields are filled
+     * No future dates/times selected
+     * Reason field is not empty
+     * Clock-out is after clock-in (minimum 1 minute on same day)
+   - Record saved with status "PENDING", is_manual_entry=true, GPS coordinates, and reason text
    - Manager reviews pending records in ManagementScreen
+   - Manager sees GPS location as clickable link to Google Maps
    - Manager approves/rejects, updating status and updated_by fields
 
 3. **Report Viewing Flow:**
    - User requests attendance history
    - Backend filters records by user_id
-   - Frontend displays records with formatted dates/times
+   - Frontend displays records with formatted dates/times in table format
+   - Table shows: Date, Clock-in time, Clock-out time, Total hours, Status (badge), Type (manual/automatic badge)
 
 ## External Dependencies
 
