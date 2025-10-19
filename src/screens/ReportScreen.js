@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button/Button';
 import Layout from '../components/Layout/Layout';
+import './ReportScreen.css';
 
 const AttendanceReportsScreen = () => {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const AttendanceReportsScreen = () => {
   const fetchUserReports = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/attendance/logs`);
+      const response = await fetch('/api/attendance/logs');
       
       if (response.ok) {
         const allReports = await response.json();
@@ -60,9 +61,18 @@ const AttendanceReportsScreen = () => {
   const getStatusText = (status) => {
     switch (status) {
       case 'APPROVED': return 'מאושר';
-      case 'PENDING': return 'ממתין לאישור';
+      case 'PENDING': return 'ממתין';
       case 'REJECTED': return 'נדחה';
       default: return status;
+    }
+  };
+
+  const getStatusClass = (status) => {
+    switch (status) {
+      case 'APPROVED': return 'status-approved';
+      case 'PENDING': return 'status-pending';
+      case 'REJECTED': return 'status-rejected';
+      default: return '';
     }
   };
 
@@ -71,41 +81,49 @@ const AttendanceReportsScreen = () => {
       <div className="reports-container">
         <div className="reports-header">
           <h1>דוחות נוכחות</h1>
-          <Button onClick={() => navigate('/home')}>
-            חזרה לעמוד הבית
-          </Button>
+          <Button onClick={() => navigate('/home')}>חזרה</Button>
         </div>
 
         {loading ? (
-          <p>טוען נתונים...</p>
+          <p className="loading-text">טוען נתונים...</p>
+        ) : reports.length === 0 ? (
+          <p className="no-data">אין דוחות נוכחות</p>
         ) : (
-          <div className="reports-list">
-            {reports.length === 0 ? (
-              <p>אין דוחות נוכחות</p>
-            ) : (
-              reports.map((report) => (
-                <div key={report.id} className="report-card">
-                  <div className="report-info">
-                    <span className="report-date">{formatDate(report.clock_in)}</span>
-                    <span className="report-times">
-                      כניסה: {formatTime(report.clock_in)}
-                      {report.clock_out && ` | יציאה: ${formatTime(report.clock_out)}`}
-                    </span>
-                    <span className="report-hours">
-                      {calculateWorkHours(report.clock_in, report.clock_out)}
-                    </span>
-                    <span className="report-status">
-                      סטטוס: {getStatusText(report.status)}
-                    </span>
-                    {report.is_manual_entry && (
-                      <span className="manual-entry">
-                        דיווח ידני
+          <div className="table-wrapper">
+            <table className="reports-table">
+              <thead>
+                <tr>
+                  <th>תאריך</th>
+                  <th>שעת כניסה</th>
+                  <th>שעת יציאה</th>
+                  <th>סה"כ שעות</th>
+                  <th>סטטוס</th>
+                  <th>סוג</th>
+                </tr>
+              </thead>
+              <tbody>
+                {reports.map((report) => (
+                  <tr key={report.id}>
+                    <td>{formatDate(report.clock_in)}</td>
+                    <td>{formatTime(report.clock_in)}</td>
+                    <td>{report.clock_out ? formatTime(report.clock_out) : '-'}</td>
+                    <td>{calculateWorkHours(report.clock_in, report.clock_out)}</td>
+                    <td>
+                      <span className={`status-badge ${getStatusClass(report.status)}`}>
+                        {getStatusText(report.status)}
                       </span>
-                    )}
-                  </div>
-                </div>
-              ))
-            )}
+                    </td>
+                    <td>
+                      {report.is_manual_entry ? (
+                        <span className="manual-badge">ידני</span>
+                      ) : (
+                        <span className="auto-badge">אוטומטי</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

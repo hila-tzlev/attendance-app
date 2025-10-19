@@ -1,0 +1,118 @@
+
+.management-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.management-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.management-header h1 {
+  color: #003087;
+  margin: 0;
+}
+
+.loading-text,
+.no-data {
+  text-align: center;
+  color: #003087;
+  font-size: 18px;
+  padding: 40px;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 48, 135, 0.1);
+}
+
+.management-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.management-table thead {
+  background: #003087;
+  color: white;
+}
+
+.management-table th {
+  padding: 15px;
+  text-align: right;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.management-table tbody tr {
+  border-bottom: 1px solid #E6F0FA;
+}
+
+.management-table tbody tr:hover {
+  background: #F0F8FF;
+}
+
+.management-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.management-table td {
+  padding: 15px 10px;
+  text-align: right;
+  color: #003087;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.approve-btn,
+.reject-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.approve-btn {
+  background: #28a745;
+  color: white;
+}
+
+.approve-btn:hover {
+  background: #218838;
+}
+
+.reject-btn {
+  background: #dc3545;
+  color: white;
+}
+
+.reject-btn:hover {
+  background: #c82333;
+}
+
+@media (max-width: 1024px) {
+  .management-table {
+    font-size: 14px;
+  }
+  
+  .management-table th,
+  .management-table td {
+    padding: 10px 8px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+}

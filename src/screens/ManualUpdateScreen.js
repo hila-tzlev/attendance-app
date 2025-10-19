@@ -1,13 +1,15 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button/Button';
 import ToastNotification from '../components/ToastNotification/ToastNotification';
 import ConfirmationModal from '../components/ConfirmationModal/ConfirmationModal';
 import Layout from '../components/Layout/Layout';
+import './ManualUpdateScreen.css';
 
 const ManualUpdateScreen = () => {
   const navigate = useNavigate();
-  const isLoggedIn = !!localStorage.getItem('employeeId');
+  const isLoggedIn = !!sessionStorage.getItem('employeeId');
   const [reports, setReports] = useState([
     {
       dateIn: new Date().toISOString().split('T')[0],
@@ -50,7 +52,6 @@ const ManualUpdateScreen = () => {
     const updatedReports = [...reports];
     updatedReports[index][field] = value;
 
-    // אם שדה הכניסה השתנה, עדכן את שעת היציאה לדקה אחת אחרי
     if (field === 'timeIn' && value) {
       const [hours, minutes] = value.split(':').map(Number);
       const inTime = new Date();
@@ -60,7 +61,6 @@ const ManualUpdateScreen = () => {
       updatedReports[index].timeOut = newTimeOut;
     }
 
-    // בדיקת תקינות תאריך ושעת יציאה
     if ((field === 'timeOut' || field === 'dateOut') && updatedReports[index].timeIn) {
       const inDateTime = new Date(`${updatedReports[index].dateIn}T${updatedReports[index].timeIn}:00`);
       const outDateTime = new Date(`${updatedReports[index].dateOut}T${updatedReports[index].timeOut || '00:00'}:00`);
@@ -76,7 +76,7 @@ const ManualUpdateScreen = () => {
         const inTime = new Date(`2000-01-01T${updatedReports[index].timeIn}:00`);
         const outTime = new Date(`2000-01-01T${value}:00`);
         const diffMs = outTime - inTime;
-        if (diffMs < 60000) { // פחות מדקה
+        if (diffMs < 60000) {
           setToastMessage('שעת היציאה חייבת להיות לפחות דקה אחרי שעת הכניסה');
           updatedReports[index].timeOut = '';
         }
@@ -92,40 +92,25 @@ const ManualUpdateScreen = () => {
 
   const calculateHours = (report) => {
     if (!report.timeIn || !report.timeOut) return '0 שעות';
-    const [inHours, inMinutes] = report.timeIn.split(':').map(Number);
-    const [outHours, outMinutes] = report.timeOut.split(':').map(Number);
-    const inTime = new Date(2000, 0, 1, inHours, inMinutes);
-    const outTime = new Date(2000, 0, 1, outHours, outMinutes);
-    const diffMs = outTime - inTime;
-    if (diffMs < 0) return 'שגיאה: שעת היציאה מוקדמת משעת הכניסה';
+    const inDateTime = new Date(`${report.dateIn}T${report.timeIn}:00`);
+    const outDateTime = new Date(`${report.dateOut}T${report.timeOut}:00`);
+    const diffMs = outDateTime - inDateTime;
+    if (diffMs < 0) return 'שגיאה';
     const hours = Math.floor(diffMs / (1000 * 60 * 60));
     const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
     return `${hours} שעות ו-${minutes} דקות`;
   };
 
-  const isReportTimeValid = (report) => {
-    if (!report.timeIn || !report.timeOut || !report.dateIn || !report.dateOut) return true;
-    const inDateTime = new Date(`${report.dateIn}T${report.timeIn}:00`);
-    const outDateTime = new Date(`${report.dateOut}T${report.timeOut}:00`);
-    return outDateTime > inDateTime;
-  };
-
   const isReportFullyValid = (report) => {
     if (!isReportValid(report)) return false;
-
     const inDateTime = new Date(`${report.dateIn}T${report.timeIn}:00`);
     const outDateTime = new Date(`${report.dateOut}T${report.timeOut}:00`);
-
-    // בדיקת תקינות התאריכים והשעות
     if (outDateTime <= inDateTime) return false;
-
-    // אם התאריכים זהים, בדיקת הפרש של לפחות דקה
     if (report.dateIn === report.dateOut) {
       const inTime = new Date(`2000-01-01T${report.timeIn}:00`);
       const outTime = new Date(`2000-01-01T${report.timeOut}:00`);
       if (outTime - inTime < 60000) return false;
     }
-
     return true;
   };
 
@@ -140,16 +125,7 @@ const ManualUpdateScreen = () => {
     }
   
     try {
-      // Convert reports to the desired format
-      const reportsToSend = reports.map(report => ({
-        dateIn: report.dateIn,
-        timeIn: report.timeIn,
-        dateOut: report.dateOut,
-        timeOut: report.timeOut,
-      }));
-  
-      // Make the API call to save the manual reports
-      const response = await fetch('http://localhost:5000/api/reports/manual', {
+      const response = await fetch('/api/reports/manual', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -168,13 +144,10 @@ const ManualUpdateScreen = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
   
-      const data = await response.json();
-      console.log('Manual reports saved:', data);
-  
       setToastMessage('הדיווח נשמר ויועבר לאישור מנהל');
       setTimeout(() => {
         navigate('/home');
-      }, 5000);
+      }, 2000);
     } catch (error) {
       console.error('Error saving manual reports:', error);
       setToastMessage('שגיאה בשמירת הדיווח. אנא נסה שוב.');
@@ -196,90 +169,102 @@ const ManualUpdateScreen = () => {
     }
   };
 
-  const confirmBack = () => {
-    setShowBackModal(false);
-    navigate('/home');
-  };
-
-  const cancelBack = () => {
-    setShowBackModal(false);
-  };
-
   return (
     <Layout>
-      <h1 className="title">עדכון ידני של דיווח שעות</h1>
-      <div className="welcome-message" style={{ textAlign: 'center' }}>
-        {reports.map((report, index) => (
-          <div key={index} className="report-entry">
-            <div className="report-row">
-              <label>כניסה:</label>
-              <input
-                type="date"
-                value={report.dateIn}
-                onChange={(e) => updateReport(index, 'dateIn', e.target.value)}
-                required
-                className="styled-input"
-              />
-              <input
-                type="time"
-                value={report.timeIn}
-                onChange={(e) => updateReport(index, 'timeIn', e.target.value)}
-                required
-                className="styled-input"
-              />
+      <div className="manual-update-container">
+        <h1 className="title">עדכון ידני של דיווח שעות</h1>
+        
+        <div className="reports-list">
+          {reports.map((report, index) => (
+            <div key={index} className="report-entry">
+              <div className="report-header">
+                <h3>דיווח {index + 1}</h3>
+                {reports.length > 1 && (
+                  <button
+                    className="remove-btn"
+                    onClick={() => removeReport(index)}
+                    title="הסרת דיווח"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+              
+              <div className="report-fields">
+                <div className="field-group">
+                  <label>תאריך כניסה:</label>
+                  <input
+                    type="date"
+                    value={report.dateIn}
+                    onChange={(e) => updateReport(index, 'dateIn', e.target.value)}
+                    className="date-input"
+                  />
+                </div>
+                
+                <div className="field-group">
+                  <label>שעת כניסה:</label>
+                  <input
+                    type="time"
+                    value={report.timeIn}
+                    onChange={(e) => updateReport(index, 'timeIn', e.target.value)}
+                    className="time-input"
+                  />
+                </div>
+                
+                <div className="field-group">
+                  <label>תאריך יציאה:</label>
+                  <input
+                    type="date"
+                    value={report.dateOut}
+                    onChange={(e) => updateReport(index, 'dateOut', e.target.value)}
+                    className="date-input"
+                  />
+                </div>
+                
+                <div className="field-group">
+                  <label>שעת יציאה:</label>
+                  <input
+                    type="time"
+                    value={report.timeOut}
+                    onChange={(e) => updateReport(index, 'timeOut', e.target.value)}
+                    className="time-input"
+                  />
+                </div>
+              </div>
+              
+              <div className="report-summary">
+                סך השעות: {calculateHours(report)}
+              </div>
             </div>
-            <div className="report-row">
-              <label>יציאה:</label>
-              <input
-                type="date"
-                value={report.dateOut}
-                onChange={(e) => updateReport(index, 'dateOut', e.target.value)}
-                required
-                className="styled-input"
-              />
-              <input
-                type="time"
-                value={report.timeOut}
-                onChange={(e) => updateReport(index, 'timeOut', e.target.value)}
-                required
-                className="styled-input"
-              />
-            </div>
-            <p>סך השעות: {calculateHours(report)}</p>
-            {reports.length > 1 && (
-              <span
-                className="remove-icon"
-                onClick={() => removeReport(index)}
-                title="הסרת דיווח"
-              >
-                −
-              </span>
-            )}
-          </div>
-        ))}
-        <span
-          className="add-icon"
-          onClick={addReport}
-          title="הוספת דיווח"
-        >
-          +
-        </span>
+          ))}
+        </div>
+        
+        <button className="add-report-btn" onClick={addReport}>
+          + הוסף דיווח נוסף
+        </button>
+        
+        <div className="action-buttons">
+          <Button 
+            title="שמור עדכון" 
+            onClick={handleSave} 
+            disabled={!areAllReportsValid()}
+          />
+          <Button title="חזור" onClick={handleBack} />
+        </div>
       </div>
-      <Button 
-        title="שמור עדכון" 
-        onClick={handleSave} 
-        disabled={!areAllReportsValid()}
-        style={{ opacity: areAllReportsValid() ? 1 : 0.5, cursor: areAllReportsValid() ? 'pointer' : 'not-allowed' }}
-      />
-      <Button title="חזור" onClick={handleBack} />
+      
       {toastMessage && (
         <ToastNotification message={toastMessage} onClose={() => setToastMessage(null)} />
       )}
+      
       <ConfirmationModal
         isOpen={showBackModal}
         message="האם אתה בטוח שברצונך לחזור ללא שמירת הדיווח?"
-        onConfirm={confirmBack}
-        onCancel={cancelBack}
+        onConfirm={() => {
+          setShowBackModal(false);
+          navigate('/home');
+        }}
+        onCancel={() => setShowBackModal(false)}
       />
     </Layout>
   );
