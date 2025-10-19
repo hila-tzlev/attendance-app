@@ -3,11 +3,33 @@
   padding: 20px;
   max-width: 1400px;
   margin: 0 auto;
+  position: relative;
+}
+
+.back-arrow {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: white;
+  border: 2px solid #003087;
+  color: #003087;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.3s;
+  z-index: 10;
+}
+
+.back-arrow:hover {
+  background: #003087;
+  color: white;
 }
 
 .management-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   margin-bottom: 30px;
 }
@@ -100,6 +122,23 @@
 
 .reject-btn:hover {
   background: #c82333;
+}
+
+.location-link {
+  color: #003087;
+  text-decoration: none;
+  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.location-link:hover {
+  background: #E6F0FA;
+  text-decoration: underline;
 }
 
 @media (max-width: 1024px) {

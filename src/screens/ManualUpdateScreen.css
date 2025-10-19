@@ -3,6 +3,34 @@
   padding: 20px;
   max-width: 800px;
   margin: 0 auto;
+  position: relative;
+}
+
+.back-arrow {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: white;
+  border: 2px solid #003087;
+  color: #003087;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.3s;
+  z-index: 10;
+}
+
+.back-arrow:hover {
+  background: #003087;
+  color: white;
+}
+
+.title {
+  text-align: center;
+  color: #003087;
+  margin-bottom: 30px;
 }
 
 .reports-list {
@@ -63,6 +91,10 @@
   flex-direction: column;
 }
 
+.field-group.field-full-width {
+  grid-column: 1 / -1;
+}
+
 .field-group label {
   color: #003087;
   font-weight: bold;
@@ -80,8 +112,21 @@
   background: white;
 }
 
+.reason-input {
+  padding: 10px;
+  border: 2px solid #E6F0FA;
+  border-radius: 8px;
+  font-size: 16px;
+  color: #003087;
+  background: white;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+}
+
 .date-input:focus,
-.time-input:focus {
+.time-input:focus,
+.reason-input:focus {
   outline: none;
   border-color: #003087;
 }
@@ -116,6 +161,8 @@
   display: flex;
   gap: 10px;
   flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
 }
 
 @media (max-width: 600px) {

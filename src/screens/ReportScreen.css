@@ -3,11 +3,33 @@
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
+  position: relative;
+}
+
+.back-arrow {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: white;
+  border: 2px solid #003087;
+  color: #003087;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.3s;
+  z-index: 10;
+}
+
+.back-arrow:hover {
+  background: #003087;
+  color: white;
 }
 
 .reports-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   margin-bottom: 30px;
 }

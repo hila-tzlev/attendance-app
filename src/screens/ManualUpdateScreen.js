@@ -16,10 +16,28 @@ const ManualUpdateScreen = () => {
       timeIn: '',
       dateOut: new Date().toISOString().split('T')[0],
       timeOut: '',
+      reason: '',
     },
   ]);
   const [toastMessage, setToastMessage] = useState(null);
   const [showBackModal, setShowBackModal] = useState(false);
+  const [location, setLocation] = useState({ latitude: null, longitude: null });
+
+  React.useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.log('Error getting location:', error);
+        }
+      );
+    }
+  }, []);
 
   if (!isLoggedIn) {
     navigate('/');
@@ -39,6 +57,7 @@ const ManualUpdateScreen = () => {
         timeIn: '',
         dateOut: new Date().toISOString().split('T')[0],
         timeOut: '',
+        reason: '',
       },
     ]);
   };
@@ -52,6 +71,22 @@ const ManualUpdateScreen = () => {
     const updatedReports = [...reports];
     updatedReports[index][field] = value;
 
+    if (field === 'dateIn' || field === 'timeIn') {
+      const now = new Date();
+      const selectedDateTime = new Date(`${updatedReports[index].dateIn}T${updatedReports[index].timeIn || '00:00'}:00`);
+      
+      if (selectedDateTime > now) {
+        setToastMessage('לא ניתן לדווח על תאריך או שעה עתידיים');
+        if (field === 'dateIn') {
+          updatedReports[index].dateIn = new Date().toISOString().split('T')[0];
+        } else {
+          updatedReports[index].timeIn = '';
+        }
+        setReports(updatedReports);
+        return;
+      }
+    }
+
     if (field === 'timeIn' && value) {
       const [hours, minutes] = value.split(':').map(Number);
       const inTime = new Date();
@@ -64,8 +99,16 @@ const ManualUpdateScreen = () => {
     if ((field === 'timeOut' || field === 'dateOut') && updatedReports[index].timeIn) {
       const inDateTime = new Date(`${updatedReports[index].dateIn}T${updatedReports[index].timeIn}:00`);
       const outDateTime = new Date(`${updatedReports[index].dateOut}T${updatedReports[index].timeOut || '00:00'}:00`);
+      const now = new Date();
 
-      if (outDateTime < inDateTime) {
+      if (outDateTime > now) {
+        setToastMessage('לא ניתן לדווח על תאריך או שעה עתידיים');
+        if (field === 'dateOut') {
+          updatedReports[index].dateOut = updatedReports[index].dateIn;
+        } else {
+          updatedReports[index].timeOut = '';
+        }
+      } else if (outDateTime < inDateTime) {
         setToastMessage('תאריך ושעת היציאה חייבים להיות אחרי תאריך ושעת הכניסה');
         if (field === 'dateOut') {
           updatedReports[index].dateOut = updatedReports[index].dateIn;
@@ -87,7 +130,7 @@ const ManualUpdateScreen = () => {
   };
 
   const isReportValid = (report) => {
-    return report.dateIn && report.timeIn && report.dateOut && report.timeOut;
+    return report.dateIn && report.timeIn && report.dateOut && report.timeOut && report.reason && report.reason.trim().length > 0;
   };
 
   const calculateHours = (report) => {
@@ -105,6 +148,9 @@ const ManualUpdateScreen = () => {
     if (!isReportValid(report)) return false;
     const inDateTime = new Date(`${report.dateIn}T${report.timeIn}:00`);
     const outDateTime = new Date(`${report.dateOut}T${report.timeOut}:00`);
+    const now = new Date();
+    
+    if (inDateTime > now || outDateTime > now) return false;
     if (outDateTime <= inDateTime) return false;
     if (report.dateIn === report.dateOut) {
       const inTime = new Date(`2000-01-01T${report.timeIn}:00`);
@@ -134,9 +180,9 @@ const ManualUpdateScreen = () => {
           userId: sessionStorage.getItem('userId'),
           clockIn: reports[0].dateIn + 'T' + reports[0].timeIn + ':00',
           clockOut: reports[0].dateOut + 'T' + reports[0].timeOut + ':00',
-          reason: 'דיווח ידני',
-          latitude: null,
-          longitude: null
+          reason: reports[0].reason,
+          latitude: location.latitude,
+          longitude: location.longitude
         }),
       });
   
@@ -172,6 +218,10 @@ const ManualUpdateScreen = () => {
   return (
     <Layout>
       <div className="manual-update-container">
+        <button className="back-arrow" onClick={handleBack} title="חזרה">
+          ← חזור
+        </button>
+        
         <h1 className="title">עדכון ידני של דיווח שעות</h1>
         
         <div className="reports-list">
@@ -198,6 +248,7 @@ const ManualUpdateScreen = () => {
                     value={report.dateIn}
                     onChange={(e) => updateReport(index, 'dateIn', e.target.value)}
                     className="date-input"
+                    max={new Date().toISOString().split('T')[0]}
                   />
                 </div>
                 
@@ -218,6 +269,7 @@ const ManualUpdateScreen = () => {
                     value={report.dateOut}
                     onChange={(e) => updateReport(index, 'dateOut', e.target.value)}
                     className="date-input"
+                    max={new Date().toISOString().split('T')[0]}
                   />
                 </div>
                 
@@ -228,6 +280,18 @@ const ManualUpdateScreen = () => {
                     value={report.timeOut}
                     onChange={(e) => updateReport(index, 'timeOut', e.target.value)}
                     className="time-input"
+                  />
+                </div>
+                
+                <div className="field-group field-full-width">
+                  <label>סיבת הדיווח (חובה):</label>
+                  <textarea
+                    value={report.reason}
+                    onChange={(e) => updateReport(index, 'reason', e.target.value)}
+                    className="reason-input"
+                    placeholder="נא למלא את הסיבה לדיווח ידני..."
+                    rows="3"
+                    required
                   />
                 </div>
               </div>
@@ -249,7 +313,6 @@ const ManualUpdateScreen = () => {
             onClick={handleSave} 
             disabled={!areAllReportsValid()}
           />
-          <Button title="חזור" onClick={handleBack} />
         </div>
       </div>
       

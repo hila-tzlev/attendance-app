@@ -14,6 +14,7 @@ const HomeScreen = () => {
   const [timeLoggedIn, setTimeLoggedIn] = useState(0);
   const [greeting, setGreeting] = useState('');
   const [toastMessage, setToastMessage] = useState(null);
+  const [location, setLocation] = useState({ latitude: null, longitude: null });
 
   useEffect(() => {
     const loadUserData = () => {
@@ -43,6 +44,20 @@ const HomeScreen = () => {
 
     loadUserData();
     updateGreeting();
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.log('Error getting location:', error);
+        }
+      );
+    }
   }, [navigate]);
 
   useEffect(() => {
@@ -87,8 +102,8 @@ const HomeScreen = () => {
         },
         body: JSON.stringify({
           userId: sessionStorage.getItem('userId'),
-          latitude: null,
-          longitude: null,
+          latitude: location.latitude,
+          longitude: location.longitude,
           isManualEntry: false,
           manualReason: null
         }),
@@ -136,8 +151,8 @@ const HomeScreen = () => {
       },
       body: JSON.stringify({
         userId: sessionStorage.getItem('userId'),
-        latitude: null,
-        longitude: null
+        latitude: location.latitude,
+        longitude: location.longitude
       }),
     })
     .then(response => {

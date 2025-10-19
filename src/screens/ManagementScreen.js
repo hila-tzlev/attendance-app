@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Button from '../components/Button/Button';
 import Layout from '../components/Layout/Layout';
 import './ManagementScreen.css';
 
@@ -95,6 +94,21 @@ const ManagementScreen = () => {
     return `${diff.toFixed(2)} שעות`;
   };
 
+  const formatLocation = (latitude, longitude) => {
+    if (latitude === null || latitude === undefined || longitude === null || longitude === undefined) return '-';
+    return (
+      <a 
+        href={`https://www.google.com/maps?q=${latitude},${longitude}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="location-link"
+        title="פתח במפות גוגל"
+      >
+        📍 מיקום
+      </a>
+    );
+  };
+
   if (!employeeId) {
     navigate('/');
     return null;
@@ -103,9 +117,12 @@ const ManagementScreen = () => {
   return (
     <Layout>
       <div className="management-container">
+        <button className="back-arrow" onClick={() => navigate('/home')} title="חזרה">
+          ← חזור
+        </button>
+        
         <div className="management-header">
           <h1>ניהול - אישור דיווחים</h1>
-          <Button onClick={() => navigate('/home')}>חזרה</Button>
         </div>
 
         {loading ? (
@@ -124,6 +141,7 @@ const ManagementScreen = () => {
                   <th>יציאה</th>
                   <th>סה"כ שעות</th>
                   <th>סיבה</th>
+                  <th>מיקום</th>
                   <th>פעולות</th>
                 </tr>
               </thead>
@@ -137,6 +155,7 @@ const ManagementScreen = () => {
                     <td>{report.clock_out ? formatTime(report.clock_out) : '-'}</td>
                     <td>{calculateWorkHours(report.clock_in, report.clock_out)}</td>
                     <td>{report.manual_reason || 'דיווח ידני'}</td>
+                    <td>{formatLocation(report.latitude, report.longitude)}</td>
                     <td>
                       <div className="action-buttons">
                         <button 

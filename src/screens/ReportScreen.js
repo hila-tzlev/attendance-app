@@ -1,7 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Button from '../components/Button/Button';
 import Layout from '../components/Layout/Layout';
 import './ReportScreen.css';
 
@@ -11,16 +10,7 @@ const AttendanceReportsScreen = () => {
   const [loading, setLoading] = useState(true);
   const userId = sessionStorage.getItem('userId');
 
-  useEffect(() => {
-    if (!userId) {
-      navigate('/');
-      return;
-    }
-
-    fetchUserReports();
-  }, [userId, navigate]);
-
-  const fetchUserReports = async () => {
+  const fetchUserReports = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch('/api/attendance/logs');
@@ -37,7 +27,16 @@ const AttendanceReportsScreen = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    if (!userId) {
+      navigate('/');
+      return;
+    }
+
+    fetchUserReports();
+  }, [userId, navigate, fetchUserReports]);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('he-IL');
@@ -79,9 +78,12 @@ const AttendanceReportsScreen = () => {
   return (
     <Layout>
       <div className="reports-container">
+        <button className="back-arrow" onClick={() => navigate('/home')} title="חזרה">
+          ← חזור
+        </button>
+        
         <div className="reports-header">
           <h1>דוחות נוכחות</h1>
-          <Button onClick={() => navigate('/home')}>חזרה</Button>
         </div>
 
         {loading ? (
