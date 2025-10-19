@@ -191,6 +191,7 @@ const ManagementScreen = () => {
           ) : myReports.length === 0 ? (
             <p className="no-data">אין דוחות נוכחות</p>
           ) : (
+            <>
             <div className="table-wrapper">
               <table className="management-table">
                 <thead>
@@ -227,6 +228,40 @@ const ManagementScreen = () => {
                 </tbody>
               </table>
             </div>
+            
+            <div className="report-cards-container">
+              {myReports.map((report) => (
+                <div key={report.id} className="report-card">
+                  <div className="report-card-header">
+                    <span className="report-card-title">{formatDate(report.clock_in)}</span>
+                    {report.is_manual_entry ? (
+                      <span className="manual-badge">ידני</span>
+                    ) : (
+                      <span className="auto-badge">אוטומטי</span>
+                    )}
+                  </div>
+                  <div className="report-card-row">
+                    <span className="report-card-label">שעת כניסה:</span>
+                    <span className="report-card-value">{formatTime(report.clock_in)}</span>
+                  </div>
+                  <div className="report-card-row">
+                    <span className="report-card-label">שעת יציאה:</span>
+                    <span className="report-card-value">{report.clock_out ? formatTime(report.clock_out) : '-'}</span>
+                  </div>
+                  <div className="report-card-row">
+                    <span className="report-card-label">סה"כ שעות:</span>
+                    <span className="report-card-value">{calculateWorkHours(report.clock_in, report.clock_out)}</span>
+                  </div>
+                  <div className="report-card-row">
+                    <span className="report-card-label">סטטוס:</span>
+                    <span className={`status-badge ${getStatusClass(report.status)}`}>
+                      {getStatusText(report.status)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            </>
           )}
           </>
         )}
@@ -240,6 +275,7 @@ const ManagementScreen = () => {
           ) : pendingApprovals.length === 0 ? (
             <p className="no-data">אין דיווחים ממתינים לאישור</p>
           ) : (
+            <>
             <div className="table-wrapper">
               <table className="management-table">
               <thead>
@@ -289,6 +325,62 @@ const ManagementScreen = () => {
               </tbody>
             </table>
           </div>
+
+          <div className="report-cards-container">
+            {pendingApprovals.map((report) => (
+              <div key={report.id} className="report-card">
+                <div className="report-card-header">
+                  <span className="report-card-title">{report.user_name || '-'}</span>
+                  <span className="manual-badge">ידני</span>
+                </div>
+                <div className="report-card-row">
+                  <span className="report-card-label">ת.ז:</span>
+                  <span className="report-card-value">{report.employee_id || '-'}</span>
+                </div>
+                <div className="report-card-row">
+                  <span className="report-card-label">תאריך:</span>
+                  <span className="report-card-value">{formatDate(report.clock_in)}</span>
+                </div>
+                <div className="report-card-row">
+                  <span className="report-card-label">כניסה:</span>
+                  <span className="report-card-value">{formatTime(report.clock_in)}</span>
+                </div>
+                <div className="report-card-row">
+                  <span className="report-card-label">יציאה:</span>
+                  <span className="report-card-value">{report.clock_out ? formatTime(report.clock_out) : '-'}</span>
+                </div>
+                <div className="report-card-row">
+                  <span className="report-card-label">סה"כ שעות:</span>
+                  <span className="report-card-value">{calculateWorkHours(report.clock_in, report.clock_out)}</span>
+                </div>
+                <div className="report-card-row">
+                  <span className="report-card-label">סיבה:</span>
+                  <span className="report-card-value">{report.manual_reason || 'דיווח ידני'}</span>
+                </div>
+                <div className="report-card-row">
+                  <span className="report-card-label">מיקום:</span>
+                  <span className="report-card-value">{formatLocation(report.latitude, report.longitude)}</span>
+                </div>
+                <div className="report-card-actions">
+                  <button 
+                    className="approve-btn"
+                    onClick={() => approveReport(report.id)}
+                    title="אשר"
+                  >
+                    ✓ אשר
+                  </button>
+                  <button 
+                    className="reject-btn"
+                    onClick={() => rejectReport(report.id)}
+                    title="דחה"
+                  >
+                    ✕ דחה
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+          </>
           )}
           </>
         )}

@@ -91,6 +91,7 @@ const AttendanceReportsScreen = () => {
         ) : reports.length === 0 ? (
           <p className="no-data">אין דוחות נוכחות</p>
         ) : (
+          <>
           <div className="table-wrapper">
             <table className="reports-table">
               <thead>
@@ -127,6 +128,40 @@ const AttendanceReportsScreen = () => {
               </tbody>
             </table>
           </div>
+
+          <div className="report-cards-container">
+            {reports.map((report) => (
+              <div key={report.id} className="report-card">
+                <div className="report-card-header">
+                  <span className="report-card-title">{formatDate(report.clock_in)}</span>
+                  {report.is_manual_entry ? (
+                    <span className="manual-badge">ידני</span>
+                  ) : (
+                    <span className="auto-badge">אוטומטי</span>
+                  )}
+                </div>
+                <div className="report-card-row">
+                  <span className="report-card-label">שעת כניסה:</span>
+                  <span className="report-card-value">{formatTime(report.clock_in)}</span>
+                </div>
+                <div className="report-card-row">
+                  <span className="report-card-label">שעת יציאה:</span>
+                  <span className="report-card-value">{report.clock_out ? formatTime(report.clock_out) : '-'}</span>
+                </div>
+                <div className="report-card-row">
+                  <span className="report-card-label">סה"כ שעות:</span>
+                  <span className="report-card-value">{calculateWorkHours(report.clock_in, report.clock_out)}</span>
+                </div>
+                <div className="report-card-row">
+                  <span className="report-card-label">סטטוס:</span>
+                  <span className={`status-badge ${getStatusClass(report.status)}`}>
+                    {getStatusText(report.status)}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+          </>
         )}
       </div>
     </Layout>

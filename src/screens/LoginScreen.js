@@ -24,7 +24,9 @@ const LoginScreen = () => {
     return sum % 10 === 0;
   };
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    if (e) e.preventDefault();
+    
     if (!employeeId && !password) {
       setError('נא להזין את פרטי ההתחברות');
       return;
@@ -47,7 +49,6 @@ const LoginScreen = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // שמירת נתוני המשתמש ב-sessionStorage
         sessionStorage.setItem('userId', data.user.id);
         sessionStorage.setItem('employeeId', data.user.employeeId);
         sessionStorage.setItem('userName', data.user.name);
@@ -68,20 +69,22 @@ const LoginScreen = () => {
     <Layout>
       <div className="login-container">
         <h1>התחברות</h1>
-        <Input
-          type="text"
-          placeholder="מספר זהות"
-          value={employeeId}
-          onChange={(e) => setEmployeeId(e.target.value)}
-        />
-        <Input
-          type="password"
-          placeholder="סיסמה"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        {error && <div className="error">{error}</div>}
-        <Button onClick={handleLogin}>התחבר</Button>
+        <form onSubmit={handleLogin}>
+          <Input
+            type="text"
+            placeholder="מספר זהות"
+            value={employeeId}
+            onChange={(e) => setEmployeeId(e.target.value)}
+          />
+          <Input
+            type="password"
+            placeholder="סיסמה"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          {error && <div className="error">{error}</div>}
+          <Button type="submit" onClick={handleLogin}>התחבר</Button>
+        </form>
       </div>
     </Layout>
   );
