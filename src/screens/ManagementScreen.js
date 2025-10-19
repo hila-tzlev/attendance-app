@@ -118,7 +118,7 @@ const ManagementScreen = () => {
     <Layout>
       <div className="management-container">
         <button className="back-arrow" onClick={() => navigate('/home')} title="חזרה">
-          ← חזור
+          ←
         </button>
         
         <div className="management-header">

@@ -8,23 +8,52 @@
 
 .back-arrow {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  background: white;
-  border: 2px solid #003087;
+  top: 15px;
+  right: 15px;
+  background: transparent;
+  border: none;
   color: #003087;
-  padding: 8px 16px;
-  border-radius: 8px;
+  padding: 8px;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: bold;
+  font-size: 24px;
   transition: all 0.3s;
   z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .back-arrow:hover {
+  color: #0052CC;
+  transform: scale(1.2);
+}
+
+.back-arrow::after {
+  content: attr(title);
+  position: absolute;
+  top: 100%;
+  right: 0;
   background: #003087;
   color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  margin-top: 5px;
+}
+
+.back-arrow:hover::after {
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .back-arrow {
+    font-size: 20px;
+    padding: 6px;
+  }
 }
 
 .reports-header {

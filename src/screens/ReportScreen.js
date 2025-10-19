@@ -79,7 +79,7 @@ const AttendanceReportsScreen = () => {
     <Layout>
       <div className="reports-container">
         <button className="back-arrow" onClick={() => navigate('/home')} title="חזרה">
-          ← חזור
+          ←
         </button>
         
         <div className="reports-header">

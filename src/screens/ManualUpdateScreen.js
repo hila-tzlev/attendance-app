@@ -219,7 +219,7 @@ const ManualUpdateScreen = () => {
     <Layout>
       <div className="manual-update-container">
         <button className="back-arrow" onClick={handleBack} title="חזרה">
-          ← חזור
+          ←
         </button>
         
         <h1 className="title">עדכון ידני של דיווח שעות</h1>
