@@ -19,6 +19,7 @@ const ManagementScreen = () => {
     } else {
       loadPendingApprovals();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   const loadMyReports = async () => {
