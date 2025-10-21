@@ -4,7 +4,7 @@ import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
 import ManualUpdateScreen from './screens/ManualUpdateScreen';
 import ReportScreen from './screens/ReportScreen';
-import ManagementScreen from './screens/ManagementScreen';
+
 import './App.css';
 
 function App() {
@@ -13,7 +13,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LoginScreen />} />
         <Route path="/home" element={<HomeScreen />} />
-        <Route path="/management" element={<ManagementScreen />} />
+        
         <Route path="/manual-update" element={<ManualUpdateScreen />} />
         <Route path="/report-screen" element={<ReportScreen />} />
       </Routes>

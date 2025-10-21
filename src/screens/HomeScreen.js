@@ -231,19 +231,12 @@ const HomeScreen = () => {
         </div>
 
         <div className="navigation-section">
-          <Button onClick={() => navigate(user.isManager ? '/management' : '/report-screen')}>
-            דוחות נוכחות
-          </Button>
-
-          <Button onClick={() => navigate('/manual-update')}>
-            דיווח ידני
-          </Button>
-
-          {user.isManager && (
-            <Button onClick={() => navigate('/management')}>
-              ניהול
-            </Button>
-          )}
+          <button className="home-button" onClick={() => navigate('/report-screen')}>
+            <i className="fa-solid fa-chart-line"></i> {user.isManager ? 'דוחות וניהול' : 'דוחות נוכחות'}
+          </button>
+          <button className="home-button" onClick={() => navigate('/manual-update')}>
+            <i className="fa-solid fa-pen"></i> דיווח ידני
+          </button>
 
           <Button onClick={handleLogout} className="logout-btn">
             התנתק
