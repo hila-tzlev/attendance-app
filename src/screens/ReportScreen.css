@@ -6,63 +6,6 @@
   position: relative;
 }
 
-.tabs-container {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-bottom: 30px;
-  border-bottom: 2px solid #E6F0FA;
-}
-
-.tab {
-  padding: 12px 30px;
-  background: transparent;
-  border: none;
-  border-bottom: 3px solid transparent;
-  color: #003087;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.3s;
-  white-space: nowrap;
-}
-
-.tab:hover {
-  background: #F0F8FF;
-  border-bottom-color: #0052CC;
-}
-
-.tab.active {
-  border-bottom-color: #003087;
-  color: #003087;
-  background: #F0F8FF;
-}
-
-.tab-content {
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  display: none;
-}
-
-.tab-content.active {
-  opacity: 1;
-  transform: translateY(0);
-  display: block;
-  animation: fadeIn 0.3s ease-in;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .back-arrow {
   position: absolute;
   top: 15px;
@@ -142,14 +85,14 @@
 }
 
 .tab:hover {
-  background: #F0F8FF;
+  background: rgba(240, 248, 255, 0.5);
   border-bottom-color: #0052CC;
 }
 
 .tab.active {
   border-bottom-color: #003087;
   color: #003087;
-  background: #F0F8FF;
+  background: rgba(240, 248, 255, 0.5);
 }
 
 .tab-content {
@@ -185,62 +128,47 @@
   padding: 40px;
 }
 
+/* טבלה מודרנית נקייה ללא מסגרת */
 .table-wrapper {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 48, 135, 0.08);
   width: 100%;
   max-width: 1600px;
   margin: 24px auto;
-  border: 1px solid #e8eef7;
-  padding: 20px;
+  padding: 0;
+  overflow-x: auto;
 }
 
 .reports-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 15px;
   table-layout: auto;
   margin: 0 auto;
 }
 
-@media (max-width: 768px) {
-  .table-wrapper {
-    overflow-x: auto;
-  }
-}
-
-@media (min-width: 769px) {
-  .reports-table {
-    min-width: auto;
-  }
-}
-
 .reports-table thead {
-  background: #EAF3FF;
-  color: #003087;
+  background: transparent;
 }
 
 .reports-table th {
-  padding: 12px 10px;
+  padding: 16px 12px;
   text-align: center;
   font-weight: 600;
   font-size: 14px;
-  border-bottom: 2px solid #d9e3f7;
+  color: #003087;
+  border-bottom: 2px solid #003087;
   white-space: nowrap;
+  background: transparent;
 }
 
 .reports-table tbody tr {
-  border-bottom: 1px solid #f0f0f0;
-  background: white;
-}
-
-.reports-table tbody tr:nth-child(even) {
-  background: #f9fbff;
+  border-bottom: 1px solid rgba(0, 48, 135, 0.1);
+  background: transparent;
+  transition: background 0.2s ease;
 }
 
 .reports-table tbody tr:hover {
-  background: #f5f8ff;
+  background: rgba(0, 48, 135, 0.03);
 }
 
 .reports-table tbody tr:last-child {
@@ -248,16 +176,16 @@
 }
 
 .reports-table td {
-  padding: 12px 10px;
+  padding: 14px 12px;
   text-align: center;
-  color: #0f1f3d;
+  color: #003087;
   font-weight: 500;
   white-space: nowrap;
+  background: transparent;
 }
 
 .reports-table td:first-child {
   font-weight: 600;
-  color: #003087;
 }
 
 .action-buttons {
@@ -270,7 +198,7 @@
 .reject-btn {
   width: 32px;
   height: 32px;
-  border: 1px solid #d0d9ed;
+  border: 1px solid rgba(0, 48, 135, 0.2);
   border-radius: 6px;
   font-size: 16px;
   cursor: pointer;
@@ -278,7 +206,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
+  background: transparent;
 }
 
 .approve-btn {
@@ -286,9 +214,9 @@
 }
 
 .approve-btn:hover {
-  background: #f0f9f4;
+  background: rgba(40, 167, 69, 0.1);
   border-color: #28a745;
-  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.1);
+  transform: scale(1.05);
 }
 
 .reject-btn {
@@ -296,15 +224,15 @@
 }
 
 .reject-btn:hover {
-  background: #fef5f6;
+  background: rgba(220, 53, 69, 0.1);
   border-color: #dc3545;
-  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.1);
+  transform: scale(1.05);
 }
 
 .location-link {
   color: #003087;
   text-decoration: none;
-  font-weight: bold;
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -314,54 +242,57 @@
 }
 
 .location-link:hover {
-  background: #E6F0FA;
+  background: rgba(0, 48, 135, 0.1);
   text-decoration: underline;
 }
 
 .status-badge {
-  padding: 4px 12px;
-  border-radius: 16px;
+  padding: 5px 14px;
+  border-radius: 20px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   display: inline-block;
   white-space: nowrap;
+  letter-spacing: 0.3px;
 }
 
 .status-approved {
-  background: #e9f6ef;
+  background: rgba(40, 167, 69, 0.15);
   color: #1f7a3d;
 }
 
 .status-pending {
-  background: #fff8e6;
+  background: rgba(255, 193, 7, 0.15);
   color: #b97820;
 }
 
 .status-rejected {
-  background: #fdecec;
+  background: rgba(220, 53, 69, 0.15);
   color: #ba2b3d;
 }
 
 .manual-badge {
-  background: #e9f6ff;
+  background: rgba(0, 102, 204, 0.15);
   color: #0066cc;
-  padding: 4px 12px;
-  border-radius: 16px;
+  padding: 5px 14px;
+  border-radius: 20px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   display: inline-block;
   white-space: nowrap;
+  letter-spacing: 0.3px;
 }
 
 .auto-badge {
-  background: #f0f0f5;
+  background: rgba(90, 90, 112, 0.15);
   color: #5a5a70;
-  padding: 4px 12px;
-  border-radius: 16px;
+  padding: 5px 14px;
+  border-radius: 20px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   display: inline-block;
   white-space: nowrap;
+  letter-spacing: 0.3px;
 }
 
 /* Cards for mobile */
@@ -376,13 +307,8 @@
   
   .reports-table th,
   .reports-table td {
-    padding: 10px 6px;
+    padding: 12px 8px;
     font-size: 12px;
-  }
-  
-  .table-wrapper {
-    max-width: 98%;
-    padding: 15px;
   }
 }
 
@@ -412,8 +338,7 @@
   }
   
   .back-arrow::after {
-    bottom: 100%;
-    margin-bottom: 5px;
+    display: none;
   }
 
   /* Hide tables, show cards */
@@ -432,8 +357,8 @@
     background: white;
     border-radius: 12px;
     padding: 18px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border: 1px solid #E6F0FA;
+    box-shadow: 0 2px 12px rgba(0, 48, 135, 0.12);
+    border: 1px solid rgba(0, 48, 135, 0.1);
   }
 
   .report-card-header {
@@ -490,5 +415,6 @@
     padding: 12px 24px;
     border-radius: 8px;
     font-size: 1.1rem;
+    font-weight: 600;
   }
 }

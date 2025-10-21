@@ -4,6 +4,7 @@ import Button from '../components/Button/Button';
 import ConfirmationModal from '../components/ConfirmationModal/ConfirmationModal';
 import ToastNotification from '../components/ToastNotification/ToastNotification';
 import Layout from '../components/Layout/Layout';
+import './HomeScreen.css';
 
 const HomeScreen = () => {
   const navigate = useNavigate();
