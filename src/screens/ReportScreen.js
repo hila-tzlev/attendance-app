@@ -217,7 +217,7 @@ const AttendanceReportsScreen = () => {
                 className={`tab ${activeTab === 'pendingApprovals' ? 'active' : ''}`}
                 onClick={() => setActiveTab('pendingApprovals')}
               >
-                ✅ דיווחים ממתינים
+                ✅ אישור דיווחים ידניים
               </button>
               <button 
                 className={`tab ${activeTab === 'employees' ? 'active' : ''}`}

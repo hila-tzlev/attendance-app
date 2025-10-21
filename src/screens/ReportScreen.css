@@ -8,8 +8,8 @@
 
 .back-arrow {
   position: fixed;
-  top: 15px;
-  right: 15px;
+  top: 85px;
+  right: 20px;
   background: transparent;
   border: none;
   color: #003087;
@@ -182,6 +182,7 @@
   font-weight: 500;
   white-space: nowrap;
   background: transparent;
+  vertical-align: middle;
 }
 
 .reports-table td:first-child {
@@ -190,9 +191,11 @@
 
 .action-buttons {
   display: flex;
+  flex-direction: row;
   gap: 6px;
   justify-content: center;
   align-items: center;
+  white-space: nowrap;
 }
 
 .approve-btn,
@@ -331,7 +334,7 @@
   .back-arrow {
     font-size: 20px;
     padding: 6px;
-    top: 15px;
+    top: 85px;
     right: 15px;
   }
   
