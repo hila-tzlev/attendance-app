@@ -62,3 +62,31 @@ Authentication involves Israeli ID validation (Luhn algorithm) and password-base
 
 -   `DATABASE_URL`: PostgreSQL connection string.
 -   `PORT`: Server listening port.
+
+## Recent Changes & Improvements (October 21, 2025)
+
+### Complete Design Overhaul - Modern Clean Aesthetic
+- **Modern Table Design:** Removed all white backgrounds and borders from tables - clean lines only
+- Tables now have transparent background with subtle hover effects
+- Border only under header (2px solid #003087) and thin lines between rows
+- Smooth hover transitions with light background tint
+- Badge styling updated with semi-transparent backgrounds and rounded corners
+- Action buttons (✓/✕) now borderless, smaller (24x24px), side-by-side (flex-direction: row), minimalist aesthetic
+- Fixed horizontal scrolling issue - tables now use overflow-x: visible on desktop
+- Back arrow now fixed position at top: 85px (below logo), stays visible during scroll
+
+### Unified Notification System
+- **Replaced all browser alert() calls with react-toastify toast notifications**
+- Success messages: `toast.success()` - green toast with checkmark
+- Error messages: `toast.error()` - red toast with X icon
+- Info messages: `toast.info()` - blue toast for neutral notifications
+- All notifications now match the modern, clean aesthetic across the application
+- Consistent notification experience on all screens (ReportScreen approvals/rejections)
+
+### UI/UX Improvements
+- Changed "דיווחים ממתינים" tab name to "אישור דיווחים ידניים" for better clarity
+- Employee name (user_name) displayed in pending approvals table
+- Home Screen: Modern gradient buttons, semi-transparent cards, responsive layout
+- Manual Update Screen: Card-based layout with gradient buttons
+- Login Screen: Cleaner design with improved error messaging
+- All screens fully responsive with mobile breakpoints at 768px and 480px

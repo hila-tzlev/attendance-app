@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import Layout from '../components/Layout/Layout';
 import Loader from '../components/Loader/Loader';
 import './ReportScreen.css';
@@ -82,7 +83,7 @@ const AttendanceReportsScreen = () => {
     try {
       const report = pendingApprovals.find(r => r.id === id);
       if (report && report.user_id === parseInt(userId)) {
-        alert('לא ניתן לאשר דיווחים עצמיים');
+        toast.error('לא ניתן לאשר דיווחים עצמיים');
         return;
       }
 
@@ -99,16 +100,16 @@ const AttendanceReportsScreen = () => {
 
       if (response.ok) {
         setPendingApprovals(prev => prev.filter(report => report.id !== id));
-        alert('דיווח אושר בהצלחה!');
+        toast.success('דיווח אושר בהצלחה!');
       } else if (response.status === 403) {
         const error = await response.json();
-        alert(error.error || 'לא ניתן לאשר דיווחים עצמיים');
+        toast.error(error.error || 'לא ניתן לאשר דיווחים עצמיים');
       } else {
-        alert('שגיאה באישור הדיווח');
+        toast.error('שגיאה באישור הדיווח');
       }
     } catch (error) {
       console.error('Error approving report:', error);
-      alert('שגיאה באישור הדיווח');
+      toast.error('שגיאה באישור הדיווח');
     }
   };
 
@@ -116,7 +117,7 @@ const AttendanceReportsScreen = () => {
     try {
       const report = pendingApprovals.find(r => r.id === id);
       if (report && report.user_id === parseInt(userId)) {
-        alert('לא ניתן לדחות דיווחים עצמיים');
+        toast.error('לא ניתן לדחות דיווחים עצמיים');
         return;
       }
 
@@ -133,11 +134,11 @@ const AttendanceReportsScreen = () => {
 
       if (response.ok) {
         setPendingApprovals(prev => prev.filter(report => report.id !== id));
-        alert('דיווח נדחה');
+        toast.info('דיווח נדחה');
       }
     } catch (error) {
       console.error('Error rejecting report:', error);
-      alert('שגיאה בדחיית הדיווח');
+      toast.error('שגיאה בדחיית הדיווח');
     }
   };
 
