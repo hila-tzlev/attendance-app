@@ -70,7 +70,9 @@ Preferred communication style: Simple, everyday language.
   - Border only under header (2px solid #003087) and thin lines between rows
   - Smooth hover transitions with light background tint
   - Badge styling updated with semi-transparent backgrounds and rounded corners
-  - Action buttons with transparent backgrounds and subtle hover effects
+  - Action buttons (✓/✕) now borderless, smaller (24x24px), side-by-side, minimalist aesthetic
+  - Fixed horizontal scrolling issue - tables now properly fit desktop screens
+  - Back arrow now fixed position (stays top-right even during scroll on mobile)
   
 - **Unified Report Screen:**
   - Eliminated separate Management screen to remove all duplication
