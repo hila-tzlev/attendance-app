@@ -231,7 +231,7 @@ const HomeScreen = () => {
         </div>
 
         <div className="navigation-section">
-          <Button onClick={() => navigate('/report-screen')}>
+          <Button onClick={() => navigate(user.isManager ? '/management' : '/report-screen')}>
             דוחות נוכחות
           </Button>
 

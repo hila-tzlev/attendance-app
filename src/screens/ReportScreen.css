@@ -85,19 +85,20 @@
 }
 
 .table-wrapper {
-  overflow-x: auto;
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 48, 135, 0.08);
-  max-width: 900px;
+  max-width: 1400px;
   margin: 24px auto;
   border: 1px solid #e8eef7;
+  padding: 0 20px;
 }
 
 .reports-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 15px;
+  table-layout: auto;
 }
 
 .reports-table thead {
