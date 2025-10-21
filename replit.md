@@ -33,7 +33,6 @@ Preferred communication style: Simple, everyday language.
 - **Layout System:** Centralized `Layout` component provides consistent header (logo), content area, and footer across all screens
 - **Screen Components:** Dedicated screen components for each major view (Login, Home, ManualUpdate, Report)
   - **ReportScreen:** Unified screen with conditional tab display - shows single tab for employees, three tabs for managers (My Reports, Pending Approvals, Employee List)
-  - **Note:** ManagementScreen.js exists in codebase but is not used (no route in App.js)
 - **Reusable UI Components:** Button, Input (with password visibility toggle), ConfirmationModal, ToastNotification, ReportCard, Loader
 - **Styling Approach:** Component-scoped CSS files with global styles in `global.css`
 
