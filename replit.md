@@ -62,7 +62,20 @@ Preferred communication style: Simple, everyday language.
 - Built production version of React application
 - Configured workflow to run server on port 5000
 
-**Latest Improvements (October 19, 2025):**
+**Latest Improvements (October 21, 2025):**
+- **Navigation Optimization for Managers:**
+  - Managers clicking "דוחות נוכחות" (Attendance Reports) button are now redirected directly to the Management Screen
+  - This eliminates duplicate views - managers see their reports in the Management Screen's "הדיווחים שלי" tab
+  - Regular employees continue to navigate to the standard Reports Screen
+  - Creates a centralized management hub for managers with all three tabs in one place
+- **Wider Table Layout:**
+  - Removed horizontal scrolling from desktop tables
+  - Increased max-width from 900px to 1400px for better readability on large screens
+  - Tables now spread across the screen with all columns visible without scrolling
+  - Maintains responsive card layout for mobile devices (<768px)
+  - Added padding to table wrapper for improved spacing
+
+**Previous Improvements (October 19, 2025):**
 - **Date/Time Validation:** Added validation to prevent manual reporting of future dates/times - input fields now have `max` attribute set to current date, and runtime validation blocks future entries
 - **Mandatory Reason Field:** Manual reports now require a textarea field explaining the reason for manual entry (enforced in validation)
 - **GPS Location Tracking:** Implemented geolocation capture for both automatic clock-in/out and manual reports using browser Geolocation API
