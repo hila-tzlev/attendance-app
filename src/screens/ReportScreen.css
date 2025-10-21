@@ -6,6 +6,63 @@
   position: relative;
 }
 
+.tabs-container {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #E6F0FA;
+}
+
+.tab {
+  padding: 12px 30px;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #003087;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  background: #F0F8FF;
+  border-bottom-color: #0052CC;
+}
+
+.tab.active {
+  border-bottom-color: #003087;
+  color: #003087;
+  background: #F0F8FF;
+}
+
+.tab-content {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  display: none;
+}
+
+.tab-content.active {
+  opacity: 1;
+  transform: translateY(0);
+  display: block;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .back-arrow {
   position: absolute;
   top: 15px;
@@ -132,28 +189,28 @@
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 48, 135, 0.08);
-  max-width: 95%;
-  width: fit-content;
+  width: 100%;
+  max-width: 1600px;
   margin: 24px auto;
   border: 1px solid #e8eef7;
   padding: 20px;
-  overflow-x: auto;
 }
 
 .reports-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
+  font-size: 15px;
   table-layout: auto;
   margin: 0 auto;
 }
 
-/* הסתרת גלילה אופקית במסכים גדולים */
-@media (min-width: 769px) {
+@media (max-width: 768px) {
   .table-wrapper {
-    overflow-x: visible;
+    overflow-x: auto;
   }
-  
+}
+
+@media (min-width: 769px) {
   .reports-table {
     min-width: auto;
   }
