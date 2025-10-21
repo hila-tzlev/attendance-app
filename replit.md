@@ -31,8 +31,10 @@ Preferred communication style: Simple, everyday language.
 
 **Component Structure:**
 - **Layout System:** Centralized `Layout` component provides consistent header (logo), content area, and footer across all screens
-- **Screen Components:** Dedicated screen components for each major view (Login, Home, ManualUpdate, Report, Management)
-- **Reusable UI Components:** Button, Input (with password visibility toggle), ConfirmationModal, ToastNotification, ReportCard
+- **Screen Components:** Dedicated screen components for each major view (Login, Home, ManualUpdate, Report)
+  - **ReportScreen:** Unified screen with conditional tab display - shows single tab for employees, three tabs for managers (My Reports, Pending Approvals, Employee List)
+  - **Note:** ManagementScreen.js exists in codebase but is not used (no route in App.js)
+- **Reusable UI Components:** Button, Input (with password visibility toggle), ConfirmationModal, ToastNotification, ReportCard, Loader
 - **Styling Approach:** Component-scoped CSS files with global styles in `global.css`
 
 **State Management:**
@@ -63,16 +65,20 @@ Preferred communication style: Simple, everyday language.
 - Configured workflow to run server on port 5000
 
 **Latest Improvements (October 21, 2025):**
-- **Navigation Optimization for Managers:**
-  - Managers clicking "דוחות נוכחות" (Attendance Reports) button are now redirected directly to the Management Screen
-  - This eliminates duplicate views - managers see their reports in the Management Screen's "הדיווחים שלי" tab
-  - Regular employees continue to navigate to the standard Reports Screen
-  - Creates a centralized management hub for managers with all three tabs in one place
-- **Wider Table Layout:**
-  - Removed horizontal scrolling from desktop tables
-  - Increased max-width from 900px to 1400px for better readability on large screens
-  - Tables now spread across the screen with all columns visible without scrolling
-  - Maintains responsive card layout for mobile devices (<768px)
+- **Unified Report Screen:**
+  - Eliminated separate Management screen to remove all duplication
+  - ReportScreen now serves both employees and managers with conditional tab display
+  - Employees see single tab: "הדיווחים שלי" (My Reports)
+  - Managers see three tabs: "הדיווחים שלי" (My Reports), "דיווחים ממתינים" (Pending Approvals), "רשימת עובדים" (Employee List)
+  - Removed "ניהול" (Management) button from HomeScreen navigation
+  - All users navigate to /report-screen for attendance reports
+  - Smooth tab transitions with fade-in animations
+- **Optimized Table Layout:**
+  - Removed horizontal scrolling from desktop tables completely
+  - Increased max-width from 900px to 1600px for better readability on large screens
+  - Tables now spread across full width without scrolling on desktop
+  - Overflow-x only enabled on mobile devices (<768px)
+  - Maintains responsive card layout for mobile devices
   - Added padding to table wrapper for improved spacing
 
 **Previous Improvements (October 19, 2025):**
@@ -97,12 +103,12 @@ Preferred communication style: Simple, everyday language.
   - Clear visual separation with labeled rows (label on right, value on left)
   - Status and type badges integrated into card headers
   - Action buttons displayed at bottom of cards with proper spacing
-- **Three-Tab Management System:**
-  - Tab 1: "📊 הדיווחים שלי" (My Reports) - Manager's personal attendance reports
-  - Tab 2: "✅ דיווחים ממתינים" (Pending Reports) - Employee reports awaiting approval
-  - Tab 3: "👥 רשימת עובדים" (Employee List) - List of all employees with details (name, ID, department, role, join date)
-  - Responsive tab layout: horizontal on desktop, vertical on mobile
-  - Smooth transitions with fade-in animations between tabs
+- **Three-Tab System in ReportScreen:**
+  - Tab 1: "📊 הדיווחים שלי" (My Reports) - Personal attendance reports (all users)
+  - Tab 2: "✅ דיווחים ממתינים" (Pending Reports) - Employee reports awaiting approval (managers only)
+  - Tab 3: "👥 רשימת עובדים" (Employee List) - List of all employees with details (managers only)
+  - Conditional display: employees see only Tab 1, managers see all three tabs
+  - Responsive tab layout with smooth transitions and fade-in animations
   - Green loader component for better loading states
 - **Self-Approval Prevention:**
   - Client-side validation: Manager's own pending reports are filtered out from the approval list
