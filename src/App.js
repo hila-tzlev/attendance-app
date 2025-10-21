@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginScreen from './screens/LoginScreen';
@@ -13,7 +14,6 @@ function App() {
       <Routes>
         <Route path="/" element={<LoginScreen />} />
         <Route path="/home" element={<HomeScreen />} />
-        
         <Route path="/manual-update" element={<ManualUpdateScreen />} />
         <Route path="/report-screen" element={<ReportScreen />} />
       </Routes>

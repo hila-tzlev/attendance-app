@@ -132,7 +132,8 @@
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 48, 135, 0.08);
-  max-width: 1200px;
+  max-width: 95%;
+  width: fit-content;
   margin: 24px auto;
   border: 1px solid #e8eef7;
   padding: 20px;
@@ -141,11 +142,21 @@
 
 .reports-table {
   width: 100%;
-  min-width: 600px;
   border-collapse: collapse;
   font-size: 14px;
   table-layout: auto;
   margin: 0 auto;
+}
+
+/* הסתרת גלילה אופקית במסכים גדולים */
+@media (min-width: 769px) {
+  .table-wrapper {
+    overflow-x: visible;
+  }
+  
+  .reports-table {
+    min-width: auto;
+  }
 }
 
 .reports-table thead {
@@ -308,7 +319,13 @@
   
   .reports-table th,
   .reports-table td {
-    padding: 10px 8px;
+    padding: 10px 6px;
+    font-size: 12px;
+  }
+  
+  .table-wrapper {
+    max-width: 98%;
+    padding: 15px;
   }
 }
 

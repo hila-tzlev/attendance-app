@@ -232,7 +232,7 @@ const HomeScreen = () => {
 
         <div className="navigation-section">
           <button className="home-button" onClick={() => navigate('/report-screen')}>
-            <i className="fa-solid fa-chart-line"></i> {user.isManager ? 'דוחות וניהול' : 'דוחות נוכחות'}
+            <i className="fa-solid fa-chart-line"></i> דוחות נוכחות
           </button>
           <button className="home-button" onClick={() => navigate('/manual-update')}>
             <i className="fa-solid fa-pen"></i> דיווח ידני
