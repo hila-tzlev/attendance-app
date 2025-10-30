@@ -198,7 +198,10 @@ class Database {
     const client = await this.pool.connect();
     try {
       let query = `
-        SELECT al.*, u.name, u.employee_id, d.name as department_name,
+        SELECT al.*, 
+               u.name as user_name, 
+               u.employee_id, 
+               d.name as department_name,
                ub.name as updated_by_name
         FROM attendance_logs al 
         JOIN users u ON al.user_id = u.id 
