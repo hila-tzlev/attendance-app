@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Layout from '../components/Layout/Layout';
 import Loader from '../components/Loader/Loader';
+import CalendarView from '../components/CalendarView';
 import './ReportScreen.css';
 
 const AttendanceReportsScreen = () => {
@@ -14,6 +15,8 @@ const AttendanceReportsScreen = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedEmployeeId, setExpandedEmployeeId] = useState(null);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
+  const [selectedEmployeeReports, setSelectedEmployeeReports] = useState([]);
   const userId = sessionStorage.getItem('userId');
   const isManager = sessionStorage.getItem('isManager') === 'true';
 
@@ -69,6 +72,35 @@ const AttendanceReportsScreen = () => {
     }
   }, []);
 
+  const fetchEmployeeReports = async (employeeId) => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/attendance/logs');
+      
+      if (response.ok) {
+        const allReports = await response.json();
+        const employeeReports = allReports.filter(report => report.user_id === parseInt(employeeId));
+        setSelectedEmployeeReports(employeeReports);
+      }
+    } catch (error) {
+      console.error('Error fetching employee reports:', error);
+      toast.error('שגיאה בטעינת דיווחי העובד');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEmployeeSelect = (e) => {
+    const employeeId = e.target.value;
+    setSelectedEmployeeId(employeeId);
+    
+    if (employeeId) {
+      fetchEmployeeReports(employeeId);
+    } else {
+      setSelectedEmployeeReports([]);
+    }
+  };
+
   useEffect(() => {
     if (!userId) {
       navigate('/');
@@ -81,8 +113,13 @@ const AttendanceReportsScreen = () => {
       fetchPendingApprovals();
     } else if (activeTab === 'employees') {
       fetchEmployees();
+    } else if (activeTab === 'calendar') {
+      fetchMyReports();
+      if (isManager && employees.length === 0) {
+        fetchEmployees();
+      }
     }
-  }, [userId, navigate, activeTab, fetchMyReports, fetchPendingApprovals, fetchEmployees]);
+  }, [userId, navigate, activeTab, fetchMyReports, fetchPendingApprovals, fetchEmployees, isManager, employees.length]);
 
   const approveReport = async (id) => {
     try {
@@ -217,6 +254,12 @@ const AttendanceReportsScreen = () => {
           >
             📊 הדיווחים שלי
           </button>
+          <button 
+            className={`tab ${activeTab === 'calendar' ? 'active' : ''}`}
+            onClick={() => setActiveTab('calendar')}
+          >
+            📅 לוח שנה
+          </button>
           {isManager && (
             <>
               <button 
@@ -316,7 +359,35 @@ const AttendanceReportsScreen = () => {
           )}
         </div>
 
-        {/* Tab 2: Pending Approvals (Manager Only) */}
+        {/* Tab 2: Calendar View */}
+        <div className={`tab-content ${activeTab === 'calendar' ? 'active' : ''}`}>
+          {isManager && (
+            <div className="employee-selector-container">
+              <label htmlFor="employeeSelect" className="employee-selector-label">
+                בחר עובד לצפייה:
+              </label>
+              <select 
+                id="employeeSelect"
+                className="employee-selector"
+                value={selectedEmployeeId || ''}
+                onChange={handleEmployeeSelect}
+              >
+                <option value="">הדיווחים שלי</option>
+                {employees.map(emp => (
+                  <option key={emp.id} value={emp.id}>
+                    {emp.name} - {emp.employee_id}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+          <CalendarView 
+            attendanceData={selectedEmployeeId ? selectedEmployeeReports : myReports} 
+            employeeName={selectedEmployeeId ? employees.find(e => e.id === parseInt(selectedEmployeeId))?.name : null}
+          />
+        </div>
+
+        {/* Tab 3: Pending Approvals (Manager Only) */}
         {isManager && (
           <div className={`tab-content ${activeTab === 'pendingApprovals' ? 'active' : ''}`}>
             {loading ? (

@@ -347,6 +347,51 @@
   display: none !important;
 }
 
+/* Employee Selector for Calendar */
+.employee-selector-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+  padding: 15px 20px;
+  background: rgba(0, 102, 204, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 102, 204, 0.15);
+}
+
+.employee-selector-label {
+  font-weight: 600;
+  color: #003087;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.employee-selector {
+  flex: 1;
+  max-width: 400px;
+  padding: 10px 15px;
+  border: 2px solid rgba(0, 102, 204, 0.3);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  direction: rtl;
+}
+
+.employee-selector:hover {
+  border-color: #0066cc;
+  box-shadow: 0 2px 8px rgba(0, 102, 204, 0.15);
+}
+
+.employee-selector:focus {
+  outline: none;
+  border-color: #003087;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
 @media (max-width: 1024px) {
   .reports-table {
     font-size: 13px;
@@ -485,6 +530,24 @@
   /* יישור עמודת שם העובד לימין */
   .reports-table td:first-child {
     text-align: right;
+  }
+
+  /* Employee selector responsive */
+  .employee-selector-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px 15px;
+  }
+
+  .employee-selector-label {
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .employee-selector {
+    max-width: 100%;
+    font-size: 13px;
   }
 }
 
