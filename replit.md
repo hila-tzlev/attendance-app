@@ -63,7 +63,30 @@ Authentication involves Israeli ID validation (Luhn algorithm) and password-base
 -   `DATABASE_URL`: PostgreSQL connection string.
 -   `PORT`: Server listening port.
 
-## Recent Changes & Improvements (October 21, 2025)
+## Recent Changes & Improvements
+
+### October 30, 2025 - Calendar View Feature
+
+**New Feature: Monthly Calendar View for Attendance Reports**
+- **📅 Calendar Tab:** Added a dedicated calendar view tab accessible to all users in the Reports screen
+- **Monthly Grid Layout:** Clean 7-day × 5-6 week calendar displaying attendance data similar to Google Calendar
+- **Attendance Display:** Each day shows clock-in time, clock-out time, and total hours worked
+- **Color-Coded Status:** Visual indicators - Green (approved), Yellow (pending), Red (rejected)
+- **Calendar Navigation:** Previous/next month buttons with "Today" quick-jump button
+- **Hebrew Month Names:** Fully localized Hebrew calendar interface
+- **Manager Features:** Employee selector dropdown allows managers to view any employee's calendar
+- **Responsive Design:** Optimized for mobile, tablet, and desktop with appropriate text sizing
+- **Smart Data Loading:** Automatically loads employee list for managers when accessing calendar tab
+- **Legend:** Color-coded legend showing status meanings for easy reference
+
+**Technical Implementation:**
+- Created new `CalendarView` component (`src/components/CalendarView.js`) with date calculation logic
+- Custom CSS styling (`src/components/CalendarView.css`) with responsive breakpoints
+- Integrated with existing `ReportScreen` with conditional employee selector for managers
+- Efficient data flow: loads user's own data by default, fetches selected employee data on demand
+- RTL-optimized layout for Hebrew text and navigation
+
+### October 21, 2025 - Design & UX Improvements
 
 ### Complete Design Overhaul - Modern Clean Aesthetic
 - **Modern Table Design:** Removed all white backgrounds and borders from tables - clean lines only
