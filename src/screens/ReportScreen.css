@@ -299,9 +299,9 @@
   letter-spacing: 0.3px;
 }
 
-/* Cards for mobile */
+/* Cards hidden - using only tables */
 .report-cards-container {
-  display: none;
+  display: none !important;
 }
 
 @media (max-width: 1024px) {
@@ -344,81 +344,59 @@
     display: none;
   }
 
-  /* Hide tables, show cards */
+  /* טבלה responsive למובייל */
   .table-wrapper {
-    display: none !important;
-    overflow-x: hidden;
-  }
-
-  .report-cards-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
     padding: 0 10px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
-  .report-card {
-    background: white;
-    border-radius: 12px;
-    padding: 18px;
-    box-shadow: 0 2px 12px rgba(0, 48, 135, 0.12);
-    border: 1px solid rgba(0, 48, 135, 0.1);
+  .reports-table {
+    font-size: 12px;
+    min-width: 100%;
   }
 
-  .report-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    padding-bottom: 12px;
-    border-bottom: 2px solid #EAF3FF;
+  .reports-table th,
+  .reports-table td {
+    padding: 10px 6px;
+    font-size: 11px;
+    white-space: nowrap;
   }
 
-  .report-card-title {
-    font-weight: 600;
-    color: #003087;
-    font-size: 1rem;
+  .status-badge,
+  .manual-badge,
+  .auto-badge {
+    padding: 4px 10px;
+    font-size: 10px;
   }
 
-  .report-card-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid #f5f5f5;
-  }
-
-  .report-card-row:last-child {
-    border-bottom: none;
-  }
-
-  .report-card-label {
-    font-weight: 600;
-    color: #666;
-    font-size: 0.9rem;
-  }
-
-  .report-card-value {
-    color: #003087;
-    font-size: 0.9rem;
-    text-align: left;
-  }
-
-  .report-card-actions {
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 2px solid #EAF3FF;
-    display: flex;
-    gap: 10px;
-    justify-content: center;
+  .action-buttons {
+    gap: 4px;
   }
 
   .approve-btn,
   .reject-btn {
-    width: auto;
-    height: auto;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: 600;
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .reports-table {
+    font-size: 11px;
+  }
+
+  .reports-table th,
+  .reports-table td {
+    padding: 8px 4px;
+    font-size: 10px;
+  }
+
+  .status-badge,
+  .manual-badge,
+  .auto-badge {
+    padding: 3px 8px;
+    font-size: 9px;
   }
 }
