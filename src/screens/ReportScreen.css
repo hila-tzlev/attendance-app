@@ -406,9 +406,13 @@
     white-space: nowrap;
   }
 
-  /* הסתר עמודת ת.ז במובייל */
+  /* הסתר עמודות נוספות במובייל */
   .reports-table th.employee-id-column,
-  .reports-table td.employee-id-column {
+  .reports-table td.employee-id-column,
+  .reports-table th:nth-child(7),
+  .reports-table td:nth-child(7),
+  .reports-table th:nth-child(8),
+  .reports-table td:nth-child(8) {
     display: none;
   }
 
@@ -416,11 +420,30 @@
   .employee-name-clickable {
     white-space: normal;
     line-height: 1.4;
+    font-size: 12px;
   }
 
   .employee-id-label {
     font-size: 9px;
     padding: 2px 6px;
+    margin-top: 2px;
+  }
+  
+  /* רוחב מינימלי לטבלה במובייל */
+  .reports-table {
+    min-width: auto !important;
+  }
+  
+  /* גודל טקסט קטן יותר במובייל */
+  .reports-table th,
+  .reports-table td {
+    padding: 8px 4px;
+    font-size: 11px;
+  }
+  
+  .reports-table th:first-child,
+  .reports-table td:first-child {
+    min-width: 80px;
   }
 
   .status-badge,
@@ -436,9 +459,32 @@
 
   .approve-btn,
   .reject-btn {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     font-size: 16px;
+  }
+  
+  /* ממרכז את עמודת הפעולות */
+  .reports-table th:last-child,
+  .reports-table td:last-child {
+    text-align: center;
+  }
+  
+  /* כותרות ממורכזות */
+  .reports-table th {
+    text-align: center;
+    font-weight: 700;
+  }
+  
+  /* תוכן ממורכז */
+  .reports-table td {
+    text-align: center;
+    vertical-align: middle;
+  }
+  
+  /* יישור עמודת שם העובד לימין */
+  .reports-table td:first-child {
+    text-align: right;
   }
 }
 
