@@ -299,6 +299,49 @@
   letter-spacing: 0.3px;
 }
 
+/* Employee name clickable */
+.employee-name-cell {
+  position: relative;
+}
+
+.employee-name-clickable {
+  cursor: pointer;
+  color: #003087;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: rgba(0, 48, 135, 0.3);
+  transition: all 0.2s;
+}
+
+.employee-name-clickable:hover {
+  color: #0052CC;
+  text-decoration-color: #0052CC;
+}
+
+.employee-id-label {
+  margin-top: 4px;
+  padding: 3px 8px;
+  background: rgba(0, 102, 204, 0.1);
+  color: #0066cc;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  display: inline-block;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Cards hidden - using only tables */
 .report-cards-container {
   display: none !important;
@@ -361,6 +404,23 @@
     padding: 10px 6px;
     font-size: 11px;
     white-space: nowrap;
+  }
+
+  /* הסתר עמודת ת.ז במובייל */
+  .reports-table th.employee-id-column,
+  .reports-table td.employee-id-column {
+    display: none;
+  }
+
+  /* שם עובד ניתן ללחיצה במובייל */
+  .employee-name-clickable {
+    white-space: normal;
+    line-height: 1.4;
+  }
+
+  .employee-id-label {
+    font-size: 9px;
+    padding: 2px 6px;
   }
 
   .status-badge,

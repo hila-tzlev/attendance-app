@@ -13,8 +13,13 @@ const AttendanceReportsScreen = () => {
   const [pendingApprovals, setPendingApprovals] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [expandedEmployeeId, setExpandedEmployeeId] = useState(null);
   const userId = sessionStorage.getItem('userId');
   const isManager = sessionStorage.getItem('isManager') === 'true';
+
+  const toggleEmployeeId = (employeeId) => {
+    setExpandedEmployeeId(expandedEmployeeId === employeeId ? null : employeeId);
+  };
 
   const fetchMyReports = useCallback(async () => {
     try {
@@ -325,7 +330,7 @@ const AttendanceReportsScreen = () => {
                     <thead>
                       <tr>
                         <th>עובד</th>
-                        <th>ת.ז</th>
+                        <th className="employee-id-column">ת.ז</th>
                         <th>תאריך</th>
                         <th>כניסה</th>
                         <th>יציאה</th>
@@ -338,8 +343,22 @@ const AttendanceReportsScreen = () => {
                     <tbody>
                       {pendingApprovals.map((report) => (
                         <tr key={report.id}>
-                          <td>{report.user_name || '-'}</td>
-                          <td>{report.employee_id || '-'}</td>
+                          <td>
+                            <div className="employee-name-cell">
+                              <span 
+                                className="employee-name-clickable"
+                                onClick={() => toggleEmployeeId(report.id)}
+                              >
+                                {report.user_name || '-'}
+                              </span>
+                              {expandedEmployeeId === report.id && (
+                                <div className="employee-id-label">
+                                  ת.ז: {report.employee_id}
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                          <td className="employee-id-column">{report.employee_id || '-'}</td>
                           <td>{formatDate(report.clock_in)}</td>
                           <td>{formatTime(report.clock_in)}</td>
                           <td>{report.clock_out ? formatTime(report.clock_out) : '-'}</td>

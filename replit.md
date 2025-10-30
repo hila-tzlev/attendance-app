@@ -86,7 +86,10 @@ Authentication involves Israeli ID validation (Luhn algorithm) and password-base
 ### UI/UX Improvements
 - Changed "דיווחים ממתינים" tab name to "אישור דיווחים ידניים" for better clarity
 - Employee name (user_name) displayed in pending approvals table
+- **Mobile-optimized employee identification:** Employee ID column hidden on mobile (<768px), clickable employee name reveals ID in a small label below (saves screen space)
+- Employee names in approval table are clickable with dotted underline, showing ID on click with smooth slide-down animation
 - Home Screen: Modern gradient buttons, semi-transparent cards, responsive layout
 - Manual Update Screen: Card-based layout with gradient buttons
 - Login Screen: Cleaner design with improved error messaging
 - All screens fully responsive with mobile breakpoints at 768px and 480px
+- Tables maintained across all screen sizes (no card conversion) with horizontal scroll on mobile when needed
