@@ -163,7 +163,7 @@ const CalendarView = ({ attendanceData, employeeName }) => {
         <div className="calendar-days">
           {calendarDays.map((day, index) => {
             const attendance = getAttendanceForDate(day.date);
-            const hasAttendance = attendance !== null;
+            const hasAttendance = attendance !== null && attendance !== undefined;
 
             return (
               <div
@@ -174,7 +174,7 @@ const CalendarView = ({ attendanceData, employeeName }) => {
               >
                 <div className="day-number">{day.date.getDate()}</div>
                 
-                {hasAttendance && day.isCurrentMonth && (
+                {hasAttendance && day.isCurrentMonth && attendance && (
                   <div className={`attendance-info ${getStatusClass(attendance.status)}`}>
                     <div className="attendance-time">
                       <span className="time-label">כניסה:</span>
