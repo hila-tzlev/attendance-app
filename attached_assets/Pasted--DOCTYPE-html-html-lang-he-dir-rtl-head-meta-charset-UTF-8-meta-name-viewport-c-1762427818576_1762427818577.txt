@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מערכת ניהול נוכחות - הדמיה עם לוח שנה</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  body {
+    font-family: 'Heebo', sans-serif;
+    background-color: #F0F8FF;
+    color: #333;
+    margin: 0;
+    padding: 0;
+  }
+
+  header {
+    text-align: center;
+    padding: 2rem 1rem 1rem;
+    color: #003087;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    padding: 2rem;
+  }
+
+  .calendar {
+    margin-top: 2rem;
+    text-align: center;
+  }
+
+  .calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #EAF3FF;
+    color: #003087;
+    border-radius: 8px;
+    padding: 10px 20px;
+  }
+
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .calendar-day {
+    border-radius: 8px;
+    padding: 15px 0;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  }
+  .calendar-day.worked {
+    background-color: #DFF2E1;
+  }
+  .calendar-day.missed {
+    background-color: #FFEAEA;
+  }
+
+  .calendar-day span {
+    display: block;
+    font-size: 0.9rem;
+  }
+
+  .calendar-nav button {
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+    color: #003087;
+  }
+
+  .employee-select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin-top: 1rem;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h2>👥 ניהול דיווחי עובדים</h2>
+      <p>בחר עובד לצפייה בלוח הדיווחים החודשי</p>
+    </header>
+
+    <select class="employee-select" onchange="showCalendar(this.value)">
+      <option value="">בחר עובד...</option>
+      <option value="dana">דנה כהן</option>
+      <option value="uri">אורי לוי</option>
+    </select>
+
+    <div class="calendar" id="calendar-section" style="display:none;">
+      <div class="calendar-header">
+        <div class="calendar-nav"><button onclick="prevMonth()"><i class="fa fa-chevron-right"></i></button></div>
+        <h3 id="month-year">אוקטובר 2025</h3>
+        <div class="calendar-nav"><button onclick="nextMonth()"><i class="fa fa-chevron-left"></i></button></div>
+      </div>
+
+      <div class="calendar-grid" id="calendar-grid">
+        <!-- ימים לדוגמה -->
+        <div class="calendar-day worked"><strong>1</strong><span>08:00 - 16:00</span></div>
+        <div class="calendar-day missed"><strong>2</strong><span>לא דווח</span></div>
+        <div class="calendar-day worked"><strong>3</strong><span>08:05 - 15:55</span></div>
+        <div class="calendar-day"><strong>4</strong></div>
+        <div class="calendar-day"><strong>5</strong></div>
+        <div class="calendar-day"><strong>6</strong></div>
+        <div class="calendar-day"><strong>7</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showCalendar(employee) {
+      const section = document.getElementById('calendar-section');
+      if (employee) {
+        section.style.display = 'block';
+      } else {
+        section.style.display = 'none';
+      }
+    }
+
+    function prevMonth() {
+      alert('מעבר לחודש קודם');
+    }
+
+    function nextMonth() {
+      alert('מעבר לחודש הבא');
+    }
+  </script>
+</body>
+</html>
+
+<!-- ✉️ הסבר לרפליט:
+כאשר מנהל בוחר עובד מתוך הרשימה, מופיעה תצוגת לוח שנה של החודש הנוכחי.
+בכל יום מוצגים שעות הדיווח או סימון של "לא דווח".
+
+✅ יש להוסיף יכולת מעבר בין חודשים (כפתורי prev/next מחליפים את התאריכים והשעות).
+✅ הנתונים ייטענו מה-API לפי מזהה העובד והחודש שנבחר.
+✅ עיצוב נשאר תואם לקו הקיים: כחול כהה #003087, רקע תכלת #F0F8FF, ולוח שנה לבן ונקי.
+✅ ב-Mobile: כל יום יוצג ככרטיס בגודל מלא (שורה אחת בכל פעם) עם גלילה אנכית.
+-->
